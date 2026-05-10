@@ -1,0 +1,48 @@
+import Link from "next/link";
+import { Container } from "./ui/Container";
+
+export function SiteFooter() {
+  return (
+    <footer className="mt-32 border-t border-border bg-surface/50">
+      <Container className="py-14 grid gap-10 md:grid-cols-4">
+        <div className="md:col-span-2">
+          <p className="font-serif text-2xl tracking-tight">Conectamente</p>
+          <p className="mt-3 max-w-sm text-sm prose-soft">
+            Um programa digital de 12 sessões para reaprenderes a tua relação com a
+            internet — sem culpa, sem extremos, com ciência.
+          </p>
+        </div>
+        <div>
+          <p className="text-sm font-medium mb-3">Programa</p>
+          <ul className="space-y-2 text-sm text-muted">
+            <li><Link href="/programa" className="hover:text-ink">Episódios</Link></li>
+            <li><Link href="/fichas" className="hover:text-ink">Fichas</Link></li>
+            <li><Link href="/dashboard" className="hover:text-ink">Dashboard</Link></li>
+            <li><Link href="/estatisticas" className="hover:text-ink">Progresso</Link></li>
+          </ul>
+        </div>
+        <div>
+          <p className="text-sm font-medium mb-3">Recursos</p>
+          <ul className="space-y-2 text-sm text-muted">
+            <li><Link href="/sobre" className="hover:text-ink">Sobre o método</Link></li>
+            <li><Link href="/sos" className="hover:text-ink">Apoio em crise</Link></li>
+            <li><Link href="/privacidade" className="hover:text-ink">Privacidade</Link></li>
+            <li><Link href="/termos" className="hover:text-ink">Termos</Link></li>
+          </ul>
+        </div>
+      </Container>
+      <Container className="pb-10">
+        <div className="border-t border-border pt-6 flex flex-col md:flex-row gap-3 md:items-center md:justify-between text-xs text-muted">
+          <p>© {new Date().getFullYear()} Conectamente · Conteúdo psicoeducativo, não substitui acompanhamento clínico.</p>
+          <p>
+            Em crise? Liga 112 ou{" "}
+            <a className="underline hover:text-ink" href="https://www.sosvozamiga.org" target="_blank" rel="noopener noreferrer">
+              SOS Voz Amiga
+            </a>
+            .
+          </p>
+        </div>
+      </Container>
+    </footer>
+  );
+}

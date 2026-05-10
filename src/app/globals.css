@@ -1,0 +1,127 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+  Conectamente — design tokens.
+  Soft, warm, clinical-but-human palette.
+  Light: paper-cream background, deep ink text, sage accent.
+  Dark: midnight navy, off-white text, dusty teal accent.
+*/
+
+:root {
+  --bg: 250 247 242;          /* paper cream */
+  --surface: 255 253 249;     /* card */
+  --elevated: 255 255 255;
+  --border: 232 226 215;
+  --ink: 24 32 42;            /* almost-black */
+  --muted: 92 99 110;
+  --subtle: 142 148 158;
+  --accent: 90 132 117;       /* sage */
+  --accent-2: 192 147 110;    /* warm clay */
+  --success: 86 145 105;
+  --warn: 196 137 56;
+  --danger: 198 79 79;
+}
+
+.dark {
+  --bg: 12 16 22;
+  --surface: 18 24 32;
+  --elevated: 24 31 41;
+  --border: 38 47 60;
+  --ink: 234 236 240;
+  --muted: 162 170 182;
+  --subtle: 110 120 134;
+  --accent: 142 196 178;
+  --accent-2: 217 174 138;
+  --success: 132 195 152;
+  --warn: 224 173 99;
+  --danger: 226 119 119;
+}
+
+html, body {
+  background: rgb(var(--bg));
+  color: rgb(var(--ink));
+  font-feature-settings: "ss01", "cv11";
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  /* iOS safe-area inset support (notch / home indicator) */
+  padding-top: env(safe-area-inset-top, 0);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  /* Avoid horizontal overflow on phones from elements that bleed past the viewport */
+  overflow-x: hidden;
+}
+
+body {
+  text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+::selection {
+  background: rgb(var(--accent) / 0.25);
+  color: rgb(var(--ink));
+}
+
+/*
+ * Focus ring — accessible, theme-aware.
+ *
+ * Uses !important deliberately. Many of our inputs apply Tailwind's
+ * `outline-none` to suppress the user-agent ring (we replace with a
+ * coloured border on focus). Without !important here, `outline-none`
+ * would also remove the keyboard-focus indicator — an a11y regression.
+ * This rule is gated on :focus-visible, so mouse clicks don't trigger it.
+ */
+:where(button, a, input, textarea, select, [role="button"], [tabindex]):focus-visible {
+  outline: 2px solid rgb(var(--accent)) !important;
+  outline-offset: 2px;
+  border-radius: 0.5rem;
+}
+
+/* Utility classes */
+@layer components {
+  .glass {
+    background: rgb(var(--surface) / 0.75);
+    backdrop-filter: saturate(140%) blur(14px);
+    -webkit-backdrop-filter: saturate(140%) blur(14px);
+    border: 1px solid rgb(var(--border) / 0.7);
+  }
+  .card {
+    background: rgb(var(--surface));
+    border: 1px solid rgb(var(--border));
+    border-radius: 1.25rem;
+  }
+  .hairline {
+    border: 1px solid rgb(var(--border));
+  }
+  .prose-soft {
+    color: rgb(var(--muted));
+    line-height: 1.7;
+  }
+  .prose-soft strong { color: rgb(var(--ink)); font-weight: 600; }
+  .heading-display {
+    font-family: var(--font-lora), Georgia, serif;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Print: optimised worksheet layout */
+@media print {
+  .no-print { display: none !important; }
+  body { background: white; color: black; }
+  .card { border-color: #ddd; box-shadow: none; }
+}
