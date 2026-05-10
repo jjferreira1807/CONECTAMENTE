@@ -2,7 +2,7 @@
 import { forwardRef, type ButtonHTMLAttributes } from "react";
 import { cn } from "@/lib/cn";
 
-type Variant = "primary" | "ghost" | "outline" | "subtle";
+type Variant = "primary" | "ghost" | "outline" | "subtle" | "premium";
 type Size = "sm" | "md" | "lg";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -12,13 +12,15 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variants: Record<Variant, string> = {
   primary:
-    "bg-ink text-bg hover:opacity-90 active:scale-[0.98] shadow-soft",
+    "bg-ink text-bg hover:opacity-90 active:scale-[0.97] shadow-soft",
+  premium:
+    "relative bg-gradient-to-br from-accent to-accent2 text-bg shadow-ambient hover:brightness-110 active:scale-[0.97]",
   ghost:
     "bg-transparent text-ink hover:bg-ink/5",
   outline:
-    "bg-transparent text-ink hairline hover:bg-ink/5",
+    "bg-transparent text-ink hairline hover:bg-ink/5 backdrop-blur",
   subtle:
-    "bg-ink/5 text-ink hover:bg-ink/10",
+    "bg-ink/5 text-ink hover:bg-ink/10 backdrop-blur",
 };
 
 const sizes: Record<Size, string> = {
@@ -35,7 +37,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     <button
       ref={ref}
       className={cn(
-        "inline-flex items-center justify-center gap-2 font-medium transition-all duration-200 select-none disabled:opacity-50 disabled:cursor-not-allowed",
+        "inline-flex items-center justify-center gap-2 font-medium transition-all duration-200 ease-cinematic select-none",
+        "disabled:opacity-50 disabled:cursor-not-allowed",
         variants[variant],
         sizes[size],
         className

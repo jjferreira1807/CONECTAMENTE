@@ -1,0 +1,15 @@
+#
+# Conectamente — pre-commit gate.
+#
+# Runs in this order:
+#   1. lint-staged → eslint --fix on staged TS/TSX files (auto-fixes simple
+#      issues and re-stages them).
+#   2. typecheck   → tsc --noEmit on the whole project. Faster than build
+#      but catches every TS error. Pre-commit is the right moment for this:
+#      we'd rather block a commit than push a broken build.
+#
+# If either step fails, the commit is aborted. Use `git commit --no-verify`
+# only in genuine emergencies — and fix the underlying issue right after.
+#
+npx lint-staged
+npm run typecheck

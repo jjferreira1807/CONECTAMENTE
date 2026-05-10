@@ -6,6 +6,7 @@ import { Menu, X } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 import { Button } from "./ui/Button";
 import { cn } from "@/lib/cn";
+import { Logomark } from "./brand/Logomark";
 
 const links = [
   { href: "/programa", label: "Programa" },
@@ -44,13 +45,13 @@ export function SiteHeader() {
       >
         <nav
           className={cn(
-            "flex items-center justify-between rounded-full px-3 md:px-4 h-14 transition-all duration-300",
-            scrolled ? "glass shadow-soft" : "bg-transparent"
+            "flex items-center justify-between rounded-full px-3 md:px-4 h-14 transition-all duration-500 ease-cinematic",
+            scrolled ? "glass-strong shadow-cinematic" : "bg-transparent"
           )}
           aria-label="Principal"
         >
-          <Link href="/" className="flex items-center gap-2 pl-2 group">
-            <Logomark />
+          <Link href="/" className="flex items-center gap-2.5 pl-2 group">
+            <Logomark size={30} />
             <span className="font-serif text-lg tracking-tight">Conectamente</span>
           </Link>
 
@@ -79,7 +80,7 @@ export function SiteHeader() {
               <Button size="sm" variant="subtle">Entrar</Button>
             </Link>
             <Link href="/programa" className="hidden md:inline-flex">
-              <Button size="sm">Começar</Button>
+              <Button size="sm" variant="premium">Começar</Button>
             </Link>
             <button
               type="button"
@@ -120,14 +121,3 @@ export function SiteHeader() {
   );
 }
 
-function Logomark() {
-  return (
-    <span
-      aria-hidden
-      className="relative inline-flex h-8 w-8 items-center justify-center rounded-full bg-accent/15 ring-1 ring-accent/20"
-    >
-      <span className="absolute inset-1.5 rounded-full bg-accent/40 animate-breathe" />
-      <span className="relative h-2 w-2 rounded-full bg-accent" />
-    </span>
-  );
-}

@@ -1,13 +1,17 @@
 import Link from "next/link";
 import { Container } from "./ui/Container";
+import { Logomark } from "./brand/Logomark";
 
 export function SiteFooter() {
   return (
-    <footer className="mt-32 border-t border-border bg-surface/50">
-      <Container className="py-14 grid gap-10 md:grid-cols-4">
+    <footer className="mt-40 border-t border-border/60 bg-surface/40 backdrop-blur-md">
+      <Container className="py-16 grid gap-10 md:grid-cols-4">
         <div className="md:col-span-2">
-          <p className="font-serif text-2xl tracking-tight">Conectamente</p>
-          <p className="mt-3 max-w-sm text-sm prose-soft">
+          <div className="flex items-center gap-2.5">
+            <Logomark size={32} />
+            <p className="font-serif text-2xl tracking-tight">Conectamente</p>
+          </div>
+          <p className="mt-4 max-w-sm text-sm prose-soft">
             Um programa digital de 12 sessões para reaprenderes a tua relação com a
             internet — sem culpa, sem extremos, com ciência.
           </p>

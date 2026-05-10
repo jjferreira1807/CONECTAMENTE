@@ -9,20 +9,31 @@ export const metadata: Metadata = {
 
 export default function StatsPage() {
   return (
-    <Container className="py-12 md:py-20">
-      <div className="max-w-2xl">
-        <p className="text-sm text-muted">Progresso</p>
-        <h1 className="heading-display text-4xl md:text-6xl mt-3">
-          O teu padrão, ao longo do tempo.
-        </h1>
-        <p className="prose-soft mt-4">
-          Não para julgares — para reparares. Os dados ajudam a ver o que
-          escapou à memória da semana.
-        </p>
-      </div>
-      <div className="mt-12">
+    <>
+      <header className="relative overflow-hidden">
+        <div
+          aria-hidden
+          className="absolute -top-32 left-1/3 w-[700px] h-[700px] rounded-full pointer-events-none"
+          style={{
+            background:
+              "radial-gradient(closest-side, rgb(var(--accent-2) / 0.18), transparent 70%)",
+            filter: "blur(60px)",
+          }}
+        />
+        <Container className="relative pt-16 md:pt-24 pb-10">
+          <p className="text-xs uppercase tracking-[0.25em] text-accent">Progresso</p>
+          <h1 className="heading-display text-4xl md:text-6xl lg:text-7xl mt-5">
+            O teu padrão,<br /><span className="text-muted">ao longo do tempo.</span>
+          </h1>
+          <p className="prose-soft mt-6 text-lg max-w-xl">
+            Não para julgares — para reparares. Os dados ajudam a ver o que escapou
+            à memória da semana.
+          </p>
+        </Container>
+      </header>
+      <Container className="pb-24 md:pb-32">
         <StatsClient />
-      </div>
-    </Container>
+      </Container>
+    </>
   );
 }

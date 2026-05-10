@@ -1,67 +1,126 @@
 "use client";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { useRef } from "react";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { fadeUp, stagger } from "@/lib/motion";
-import { ArrowRight, Play } from "lucide-react";
+import { ArrowRight, Play, Sparkles } from "lucide-react";
+import { useAppReady } from "@/components/AppReady";
 
+/**
+ * Hero with parallax aurora and character-stagger reveal.
+ *
+ * Layers (bottom to top):
+ *   1. Parallax orb that moves slower than scroll
+ *   2. Floating dots above the gradient
+ *   3. Headline + sub + CTAs with stagger
+ *   4. Stats strip with hairline dividers
+ */
 export function Hero() {
+  const reduce = useReducedMotion();
+  const ready = useAppReady();
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollY } = useScroll();
+  // Orb drifts upward as user scrolls — subtle
+  const orbY = useTransform(scrollY, [0, 600], reduce ? [0, 0] : [0, -120]);
+
   return (
-    <section className="relative pt-10 md:pt-14 pb-20 md:pb-32 overflow-hidden">
-      <Aurora />
+    <section
+      ref={ref}
+      className="relative pt-12 md:pt-20 pb-24 md:pb-36 overflow-hidden"
+    >
+      {/* Aurora — parallax */}
+      <motion.div
+        aria-hidden
+        className="absolute inset-0 -z-10 pointer-events-none"
+        style={{ y: orbY }}
+      >
+        <div
+          className="absolute -top-32 left-1/2 -translate-x-1/2 w-[1200px] h-[1200px] rounded-full"
+          style={{
+            background:
+              "radial-gradient(closest-side, rgb(var(--accent) / 0.4), transparent 70%)",
+            filter: "blur(60px)",
+          }}
+        />
+        <div
+          className="absolute top-32 right-0 w-[700px] h-[700px] rounded-full"
+          style={{
+            background:
+              "radial-gradient(closest-side, rgb(var(--accent-2) / 0.3), transparent 70%)",
+            filter: "blur(70px)",
+            animation: "drift 30s ease-in-out infinite",
+          }}
+        />
+        <div
+          className="absolute inset-x-0 top-0 h-px"
+          style={{
+            background:
+              "linear-gradient(90deg, transparent, rgb(var(--border) / 0.6), transparent)",
+          }}
+        />
+      </motion.div>
+
       <Container>
         <motion.div
-          variants={stagger(0.1)}
+          variants={stagger(0.08)}
           initial="hidden"
-          animate="show"
+          animate={ready ? "show" : "hidden"}
           className="max-w-3xl"
         >
-          <motion.p variants={fadeUp} className="text-sm text-muted">
-            Programa digital de 12 sessões · TCC · em PT-PT
-          </motion.p>
+          <motion.div variants={fadeUp} className="inline-flex items-center gap-2 rounded-full glass px-3 py-1.5 text-xs tracking-wider uppercase text-muted">
+            <Sparkles className="h-3 w-3 text-accent" />
+            Programa digital · TCC · em PT-PT
+          </motion.div>
 
           <motion.h1
             variants={fadeUp}
-            className="heading-display text-5xl md:text-7xl mt-5"
+            className="heading-display text-5xl md:text-7xl lg:text-[5.25rem] mt-6"
           >
             Reaprende a tua relação<br />
-            <span className="text-accent">com a internet.</span>
+            <span
+              className="gradient-headline bg-gradient-to-r from-accent via-accent2 to-accent bg-clip-text text-transparent animate-gradient-drift"
+              style={{ backgroundSize: "220% 100%" }}
+            >
+              com a internet.
+            </span>
           </motion.h1>
 
           <motion.p
             variants={fadeUp}
-            className="prose-soft mt-6 text-lg max-w-xl"
+            className="prose-soft mt-6 text-lg md:text-xl max-w-xl"
           >
             Sem extremos. Sem culpa. Um caminho guiado, baseado em Terapia
             Cognitivo-Comportamental, para adultos que sentem que o telemóvel
             ocupa demasiado espaço no dia — e no sono.
           </motion.p>
 
-          <motion.div variants={fadeUp} className="mt-8 flex flex-wrap items-center gap-3">
+          <motion.div variants={fadeUp} className="mt-9 flex flex-wrap items-center gap-3">
             <Link href="/programa">
-              <Button size="lg">
-                Começar gratuitamente <ArrowRight className="h-4 w-4" />
+              <Button size="lg" className="gap-2.5 group">
+                Começar gratuitamente
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </Button>
             </Link>
             <Link href="/intro">
-              <Button size="lg" variant="outline">
+              <Button size="lg" variant="outline" className="gap-2.5">
                 <Play className="h-4 w-4" /> Ver introdução · 90s
               </Button>
             </Link>
           </motion.div>
 
-          <motion.p variants={fadeUp} className="mt-5 text-xs text-muted">
-            Sem anúncios. Sem cookies de tracking. O teu progresso fica neste dispositivo
-            (ou na tua conta, se preferires).
+          <motion.p variants={fadeUp} className="mt-6 text-xs text-muted">
+            Sem anúncios. Sem cookies de tracking. O teu progresso fica neste
+            dispositivo (ou na tua conta, se preferires).
           </motion.p>
         </motion.div>
 
         <motion.div
-          variants={fadeUp}
-          initial="hidden"
-          animate="show"
-          className="mt-20 md:mt-28"
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7, duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+          className="mt-24 md:mt-32"
         >
           <Stats />
         </motion.div>
@@ -70,40 +129,29 @@ export function Hero() {
   );
 }
 
-function Aurora() {
-  return (
-    <div className="absolute inset-0 -z-10 overflow-hidden" aria-hidden>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1.4 }}
-        className="absolute -top-40 left-1/2 -translate-x-1/2 w-[1100px] h-[1100px] rounded-full bg-gradient-warm blur-3xl"
-      />
-      <div
-        className="absolute inset-x-0 top-0 h-px"
-        style={{
-          background:
-            "linear-gradient(90deg, transparent, rgb(var(--border) / 0.6), transparent)",
-        }}
-      />
-    </div>
-  );
-}
+/* ------------------------------------------------------------------------ */
 
 function Stats() {
   const items = [
     { k: "12", v: "sessões guiadas" },
-    { k: "8", v: "exercícios interactivos" },
-    { k: "5", v: "fichas descarregáveis" },
+    { k: "8",  v: "exercícios interativos" },
+    { k: "5",  v: "fichas descarregáveis" },
     { k: "100%", v: "em português de Portugal" },
   ];
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-border rounded-2xl overflow-hidden hairline">
-      {items.map((it) => (
-        <div key={it.v} className="bg-bg p-5">
-          <p className="font-serif text-3xl tabular-nums">{it.k}</p>
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-border/60 rounded-3xl overflow-hidden hairline backdrop-blur-md">
+      {items.map((it, i) => (
+        <motion.div
+          key={it.v}
+          initial={{ opacity: 0, y: 12 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-40px" }}
+          transition={{ delay: 0.05 * i, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          className="bg-bg/70 p-6"
+        >
+          <p className="font-serif text-3xl md:text-4xl tabular-nums">{it.k}</p>
           <p className="text-xs text-muted mt-1">{it.v}</p>
-        </div>
+        </motion.div>
       ))}
     </div>
   );

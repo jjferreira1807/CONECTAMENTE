@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import type { Worksheet } from "@/content/worksheets";
 import Link from "next/link";
-import { ArrowLeft, Printer, Trash } from "lucide-react";
+import { ArrowLeft, Download, Printer, Trash } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { remote } from "@/lib/sync/pushers";
 
@@ -33,6 +33,31 @@ export function WorksheetView({ worksheet }: { worksheet: Worksheet }) {
   }, [hydrated, data, storageKey]);
 
   const reset = () => { setData({}); };
+  const [downloading, setDownloading] = useState(false);
+
+  async function downloadPDF() {
+    setDownloading(true);
+    try {
+      // Dynamic import keeps @react-pdf/renderer (~250kB) out of the main bundle.
+      const [{ pdf }, { WorksheetPDF }] = await Promise.all([
+        import("@react-pdf/renderer"),
+        import("@/lib/pdf/WorksheetPDF"),
+      ]);
+      const blob = await pdf(<WorksheetPDF worksheet={worksheet} answers={data} />).toBlob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `conectamente-${worksheet.slug}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      remote.download({ resource: `fichas/${worksheet.slug}`, format: "pdf" });
+      remote.analytics({ kind: "download", attrs: { resource: worksheet.slug, format: "pdf" } });
+    } finally {
+      setDownloading(false);
+    }
+  }
 
   return (
     <article className="max-w-3xl mx-auto">
@@ -46,13 +71,23 @@ export function WorksheetView({ worksheet }: { worksheet: Worksheet }) {
           </Button>
           <Button
             size="sm"
+            variant="outline"
             onClick={() => {
               remote.download({ resource: `fichas/${worksheet.slug}`, format: "print" });
-              remote.analytics({ kind: "download", attrs: { resource: worksheet.slug } });
+              remote.analytics({ kind: "download", attrs: { resource: worksheet.slug, format: "print" } });
               window.print();
             }}
           >
-            <Printer className="h-4 w-4" /> Imprimir / PDF
+            <Printer className="h-4 w-4" /> Imprimir
+          </Button>
+          <Button
+            size="sm"
+            variant="premium"
+            onClick={downloadPDF}
+            disabled={downloading}
+            aria-busy={downloading}
+          >
+            <Download className="h-4 w-4" /> {downloading ? "A gerar…" : "Descarregar PDF"}
           </Button>
         </div>
       </div>

@@ -4,76 +4,110 @@
 
 /*
   Conectamente — design tokens.
-  Soft, warm, clinical-but-human palette.
-  Light: paper-cream background, deep ink text, sage accent.
-  Dark: midnight navy, off-white text, dusty teal accent.
+  Deep-night-blue dark mode (Calm/Headspace inspired), therapeutic teal-green
+  primary, soft amber gold for emphasis, warm cream light mode for daytime.
 */
 
-:root {
-  --bg: 250 247 242;          /* paper cream */
-  --surface: 255 253 249;     /* card */
-  --elevated: 255 255 255;
-  --border: 232 226 215;
-  --ink: 24 32 42;            /* almost-black */
-  --muted: 92 99 110;
-  --subtle: 142 148 158;
-  --accent: 90 132 117;       /* sage */
-  --accent-2: 192 147 110;    /* warm clay */
-  --success: 86 145 105;
-  --warn: 196 137 56;
-  --danger: 198 79 79;
+/*
+ * Default is DARK (matches `defaultTheme="dark"` in ThemeProvider). SSR HTML
+ * paints dark immediately, eliminating the flash from light→dark when
+ * next-themes hydrates. `.light` overrides; `.dark` is explicit when the
+ * user toggles back from light.
+ */
+
+:root, .dark {
+  --bg: 6 9 14;
+  --surface: 11 16 24;
+  --elevated: 16 22 33;
+  --border: 28 38 54;
+  --ink: 232 237 244;
+  --muted: 148 162 180;
+  --subtle: 100 112 128;
+  --accent: 110 200 175;
+  --accent-2: 226 184 122;
+  --success: 132 200 152;
+  --warn: 226 178 100;
+  --danger: 226 119 119;
+
+  --glow: 110 200 175;
+  --glow-2: 226 184 122;
+  --star: 232 237 244;
+  --star-alpha: 0.55;
 }
 
-.dark {
-  --bg: 12 16 22;
-  --surface: 18 24 32;
-  --elevated: 24 31 41;
-  --border: 38 47 60;
-  --ink: 234 236 240;
-  --muted: 162 170 182;
-  --subtle: 110 120 134;
-  --accent: 142 196 178;
-  --accent-2: 217 174 138;
-  --success: 132 195 152;
-  --warn: 224 173 99;
-  --danger: 226 119 119;
+.light {
+  --bg: 246 242 235;
+  --surface: 252 249 243;
+  --elevated: 255 252 247;
+  --border: 226 218 204;
+  --ink: 18 22 30;
+  --muted: 88 96 110;
+  --subtle: 138 144 156;
+  --accent: 30 110 90;
+  --accent-2: 178 122 60;
+  --success: 60 130 95;
+  --warn: 196 137 56;
+  --danger: 198 79 79;
+
+  --glow: 30 110 90;
+  --glow-2: 200 145 80;
+  --star: 18 22 30;
+  --star-alpha: 0.18;
 }
 
 html, body {
   background: rgb(var(--bg));
   color: rgb(var(--ink));
-  font-feature-settings: "ss01", "cv11";
+}
+
+/*
+ * Font-features are font-specific. Previously `ss01, cv11` was set globally —
+ * those are Inter's stylistic-set glyph swaps and were inherited by Lora,
+ * potentially triggering unwanted glyph substitutions on serif text.
+ *
+ * Scope each font correctly:
+ *   - body (sans/Inter): tabular-nums hint + Inter's preferred stylistic set
+ *   - serif (Lora):      pure kerning + standard ligatures, NO Inter SS
+ */
+body {
+  font-feature-settings: "kern" 1, "liga" 1, "ss01" 1, "cv11" 1;
+}
+
+.font-serif, .heading-display {
+  font-feature-settings: "kern" 1, "liga" 1, "dlig" 1;
 }
 
 html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  /* iOS safe-area inset support (notch / home indicator) */
   padding-top: env(safe-area-inset-top, 0);
   padding-bottom: env(safe-area-inset-bottom, 0);
-  /* Avoid horizontal overflow on phones from elements that bleed past the viewport */
   overflow-x: hidden;
 }
 
 body {
   text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
+  /* Subtle vignette in dark — pulls focus to the centre */
+  background-image: radial-gradient(120% 80% at 50% 0%, transparent 0%, rgb(0 0 0 / 0.18) 100%);
+  /* Smooth theme switching across vars */
+  transition:
+    background-color 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    color 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 ::selection {
-  background: rgb(var(--accent) / 0.25);
+  background: rgb(var(--accent) / 0.35);
   color: rgb(var(--ink));
 }
 
 /*
- * Focus ring — accessible, theme-aware.
- *
- * Uses !important deliberately. Many of our inputs apply Tailwind's
- * `outline-none` to suppress the user-agent ring (we replace with a
- * coloured border on focus). Without !important here, `outline-none`
- * would also remove the keyboard-focus indicator — an a11y regression.
- * This rule is gated on :focus-visible, so mouse clicks don't trigger it.
+ * Focus ring — accessible, theme-aware. !important is intentional: many
+ * inputs use Tailwind `outline-none` to suppress the user-agent ring; without
+ * !important here the keyboard-focus indicator would also disappear (a11y).
+ * Gated on :focus-visible so mouse clicks never trigger.
  */
 :where(button, a, input, textarea, select, [role="button"], [tabindex]):focus-visible {
   outline: 2px solid rgb(var(--accent)) !important;
@@ -81,18 +115,25 @@ body {
   border-radius: 0.5rem;
 }
 
-/* Utility classes */
+/* Components ============================================================= */
 @layer components {
   .glass {
-    background: rgb(var(--surface) / 0.75);
-    backdrop-filter: saturate(140%) blur(14px);
-    -webkit-backdrop-filter: saturate(140%) blur(14px);
+    background: rgb(var(--surface) / 0.62);
+    backdrop-filter: saturate(160%) blur(20px);
+    -webkit-backdrop-filter: saturate(160%) blur(20px);
     border: 1px solid rgb(var(--border) / 0.7);
   }
+  .glass-strong {
+    background: rgb(var(--surface) / 0.85);
+    backdrop-filter: saturate(180%) blur(28px);
+    -webkit-backdrop-filter: saturate(180%) blur(28px);
+    border: 1px solid rgb(var(--border) / 0.8);
+  }
   .card {
-    background: rgb(var(--surface));
-    border: 1px solid rgb(var(--border));
-    border-radius: 1.25rem;
+    background: rgb(var(--surface) / 0.85);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgb(var(--border) / 0.6);
+    border-radius: 1.5rem;
   }
   .hairline {
     border: 1px solid rgb(var(--border));
@@ -102,14 +143,100 @@ body {
     line-height: 1.7;
   }
   .prose-soft strong { color: rgb(var(--ink)); font-weight: 600; }
+  /*
+   * Display headings — editorial serif at large sizes.
+   *
+   *   • letter-spacing -0.018em: tight but never overlaps on Lora. The
+   *     previous -0.025em caused descenders/serifs to collide ("ag", "ti",
+   *     "rn" pairs) at 4–7xl sizes.
+   *   • line-height 1.08: gives ~5–8% headroom for ascenders and prevents
+   *     descender clipping ("g", "p", "j", "y", "ç") on multi-line headings,
+   *     especially when combined with `bg-clip-text`.
+   *   • text-wrap: balance: distributes lines evenly so we don't end with a
+   *     single orphaned word (modern Safari/Chrome; harmless fallback).
+   *   • font-weight 500: Lora's medium has slightly weightier serifs that
+   *     render cleaner at display sizes than 400's hairlines.
+   */
   .heading-display {
-    font-family: var(--font-lora), Georgia, serif;
-    letter-spacing: -0.02em;
-    line-height: 1.05;
+    font-family: var(--font-lora), Georgia, "Times New Roman", serif;
+    font-weight: 500;
+    letter-spacing: -0.018em;
+    line-height: 1.08;
+    text-wrap: balance;
+    /* Tiny safe margin so the bottom of "g/p/y/ç" is never clipped by a
+     * containing element with overflow:hidden. */
+    padding-bottom: 0.02em;
+  }
+
+  /*
+   * Companion utility for any `bg-clip-text + text-transparent` heading.
+   *
+   * When you paint a gradient onto text, the browser computes a clip-path from
+   * the glyph bounding-boxes. Descenders that extend below the baseline get
+   * cropped harder than normal text. We add a tiny padding-bottom + a slightly
+   * looser line-height to give them room. Apply ON THE SPAN, not the H1.
+   */
+  .gradient-headline {
+    display: inline-block;
+    padding-bottom: 0.08em;
+    line-height: 1.12;
+  }
+
+  /*
+   * Smaller serif headings (h2/h3 inside cards) automatically inherit kerning
+   * from .font-serif above; we add a gentler letter-spacing here. The
+   * .heading-display rule wins for the display tier via specificity ordering.
+   */
+  .font-serif {
+    letter-spacing: -0.012em;
+  }
+  .glow-accent {
+    box-shadow:
+      0 0 0 1px rgb(var(--accent) / 0.18),
+      0 0 40px -10px rgb(var(--glow) / 0.4),
+      0 0 80px -20px rgb(var(--glow) / 0.3);
+  }
+  .glow-amber {
+    box-shadow:
+      0 0 0 1px rgb(var(--accent-2) / 0.18),
+      0 0 40px -10px rgb(var(--glow-2) / 0.5),
+      0 0 80px -20px rgb(var(--glow-2) / 0.3);
+  }
+  /* Premium pill shadow */
+  .shadow-elevated {
+    box-shadow:
+      0 1px 0 rgb(255 255 255 / 0.04) inset,
+      0 1px 2px rgb(0 0 0 / 0.2),
+      0 8px 32px -12px rgb(0 0 0 / 0.4);
   }
 }
 
-/* Reduced motion */
+/* Atmosphere keyframes ==================================================== */
+
+@keyframes drift {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  50%  { transform: translate3d(40px, -20px, 0) scale(1.06); }
+  100% { transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@keyframes drift-reverse {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  50%  { transform: translate3d(-40px, 30px, 0) scale(1.04); }
+  100% { transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: var(--twinkle-min, 0.2); }
+  50%      { opacity: var(--twinkle-max, 0.9); }
+}
+
+@keyframes neural-pulse {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50%      { opacity: 1;   transform: scale(1.15); }
+}
+
+/* Reduced motion ========================================================= */
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.001ms !important;
@@ -119,9 +246,10 @@ body {
   }
 }
 
-/* Print: optimised worksheet layout */
+/* Print =================================================================== */
+
 @media print {
   .no-print { display: none !important; }
   body { background: white; color: black; }
-  .card { border-color: #ddd; box-shadow: none; }
+  .card { border-color: #ddd; box-shadow: none; backdrop-filter: none; }
 }

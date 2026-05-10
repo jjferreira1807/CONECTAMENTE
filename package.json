@@ -4,12 +4,24 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:check": "concurrently --kill-others-on-fail -n next,types -c blue,magenta \"next dev\" \"tsc --noEmit --watch --preserveWatchOutput\"",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "lint:fix": "next lint --fix",
+    "typecheck": "tsc --noEmit",
+    "typecheck:watch": "tsc --noEmit --watch --preserveWatchOutput",
+    "verify": "npm run lint && npm run typecheck && npm run build",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "next lint --fix --file"
+    ],
+    "*.{css,md,json}": []
   },
   "dependencies": {
+    "@react-pdf/renderer": "^4.1.5",
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.45.4",
     "clsx": "^2.1.1",
@@ -29,8 +41,11 @@
     "@types/react": "^18.3.11",
     "@types/react-dom": "^18.3.0",
     "autoprefixer": "^10.4.20",
+    "concurrently": "^9.1.0",
     "eslint": "^8.57.1",
     "eslint-config-next": "14.2.16",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.2.10",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.13",
     "typescript": "^5.6.2"
