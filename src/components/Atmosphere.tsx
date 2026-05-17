@@ -44,7 +44,10 @@ export function Atmosphere() {
         willChange: "opacity",
       }}
     >
-      {/* Aurora gradients — SSR-friendly, pure CSS animations */}
+      {/* Aurora gradients — SSR-friendly, pure CSS animations.
+          `will-change: transform` promove cada gradiente para uma camada
+          GPU própria, evitando que o motor tenha de re-blur o bitmap a cada
+          frame da animação drift. Crucial em mobile onde o blur é caro. */}
       <div className="absolute inset-0">
         <div
           className="absolute -top-[20%] -left-[10%] h-[70vmax] w-[70vmax] rounded-full opacity-70"
@@ -53,6 +56,7 @@ export function Atmosphere() {
               "radial-gradient(closest-side, rgb(var(--accent) / 0.35), transparent 70%)",
             filter: "blur(80px)",
             animation: "drift 28s ease-in-out infinite",
+            willChange: "transform",
           }}
         />
         <div
@@ -62,6 +66,7 @@ export function Atmosphere() {
               "radial-gradient(closest-side, rgb(var(--accent-2) / 0.28), transparent 70%)",
             filter: "blur(80px)",
             animation: "drift-reverse 36s ease-in-out infinite",
+            willChange: "transform",
           }}
         />
         <div
@@ -71,6 +76,7 @@ export function Atmosphere() {
               "radial-gradient(closest-side, rgb(var(--glow) / 0.18), transparent 70%)",
             filter: "blur(70px)",
             animation: "drift 44s ease-in-out infinite reverse",
+            willChange: "transform",
           }}
         />
       </div>

@@ -303,6 +303,36 @@ html.theme-switching *::after {
   }
 }
 
+/*
+ * Mobile scroll performance — backdrop-filter optimization.
+ *
+ * `backdrop-filter: blur()` é a operação de paint mais cara que existe em
+ * mobile. Numa página típica há 5-15 elementos com algum tipo de blur visíveis
+ * ao mesmo tempo (.card, .glass, .glass-strong, Tailwind backdrop-blur-md).
+ * Cada um recomputa o backdrop a cada frame de scroll, derrubando o frame
+ * rate de 60fps para 20-40fps em iOS Safari e Android Chrome.
+ *
+ * Trade-off: em mobile substituímos por fundos sólidos. Visualmente quase
+ * imperceptível (o blur é subtil sobre o fundo escuro uniforme), o ganho
+ * de scroll-fps é dramático.
+ *
+ * `!important` é intencional aqui — Tailwind utilities como `backdrop-blur-md`
+ * têm specificity alta; sem !important este media query não os apanha.
+ * Detection via `(hover: none) and (pointer: coarse)` é mais fiável que
+ * max-width porque captura também tablets em portrait.
+ */
+@media (hover: none) and (pointer: coarse) {
+  .glass,
+  .glass-strong,
+  .card,
+  [class*="backdrop-blur"] {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+  .glass { background: rgb(var(--surface) / 0.92); }
+  .glass-strong { background: rgb(var(--surface) / 0.96); }
+}
+
 /* Print =================================================================== */
 
 @media print {
