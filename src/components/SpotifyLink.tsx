@@ -36,7 +36,7 @@ export function SpotifyLink({
       title="Ouvir podcast no Spotify"
       className={cn(
         "group inline-flex items-center gap-2 rounded-full hairline bg-surface/70 text-ink",
-        "transition-all duration-200 ease-cinematic select-none",
+        "transition duration-200 ease-cinematic select-none",
         "hover:bg-ink/5 hover:shadow-soft active:scale-[0.97]",
         isIcon ? "h-10 w-10 justify-center" : "h-10 pl-2 pr-4 text-sm",
         className,
