@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
@@ -25,6 +25,7 @@ export function SiteHeader() {
   const { user, ready: authReady } = useSupabaseUser();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -35,12 +36,33 @@ export function SiteHeader() {
 
   useEffect(() => setOpen(false), [pathname]);
 
+  // Mobile menu: fechar ao clicar fora do header ou via Esc — UX standard
+  // em tablet (sem hover) onde o utilizador espera que o menu se feche
+  // simplesmente clicando no conteúdo. Listeners só montados quando o menu
+  // está aberto para não pesar nada quando fechado.
+  useEffect(() => {
+    if (!open) return;
+    const onDoc = (e: MouseEvent) => {
+      if (!headerRef.current?.contains(e.target as Node)) setOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("mousedown", onDoc);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDoc);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
   return (
     // Header gated on AppReady so its entrance choreographs with the
     // cutscene's dissolve — when the cutscene's backdrop fades, the header
     // slides down + fades in over the same 800ms window. No more "pop in"
     // seam between the intro and the website.
     <motion.header
+      ref={headerRef}
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: ready ? 1 : 0, y: ready ? 0 : -10 }}
       transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
@@ -102,7 +124,8 @@ export function SiteHeader() {
               type="button"
               onClick={() => setOpen((v) => !v)}
               aria-label="Menu"
-              className="md:hidden inline-flex h-10 w-10 items-center justify-center rounded-full hairline bg-surface/80"
+              aria-expanded={open}
+              className="md:hidden inline-flex h-11 w-11 items-center justify-center rounded-full hairline bg-surface/80"
             >
               {open ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
             </button>
@@ -124,7 +147,7 @@ export function SiteHeader() {
                   <li key={l.href}>
                     <Link
                       href={l.href}
-                      className="block px-3 py-2.5 text-sm rounded-xl hover:bg-ink/5 active:bg-ink/10 transition-colors"
+                      className="flex items-center min-h-[44px] px-3 text-sm rounded-xl hover:bg-ink/5 active:bg-ink/10 transition-colors"
                     >
                       {l.label}
                     </Link>

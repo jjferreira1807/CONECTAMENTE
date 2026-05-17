@@ -85,6 +85,25 @@ html {
   padding-top: env(safe-area-inset-top, 0);
   padding-bottom: env(safe-area-inset-bottom, 0);
   overflow-x: hidden;
+  /* Mobile UX: remove o highlight cinzento default do iOS (focus-visible já
+   * dá feedback claro de teclado; a paleta é gerida pela nossa CSS). */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/*
+ * Touch optimisation universal — `touch-action: manipulation` remove os
+ * ~300ms de delay para tap-detection e impede double-tap zoom em todos os
+ * controles. Aplicado em interactivos, não no documento inteiro (manter
+ * pinch-zoom em texto/imagens para acessibilidade).
+ */
+button,
+a,
+[role="button"],
+input,
+textarea,
+select,
+label {
+  touch-action: manipulation;
 }
 
 body {

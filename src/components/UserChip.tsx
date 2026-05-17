@@ -149,7 +149,7 @@ export function UserChip({ className }: { className?: string }) {
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="menu"
         aria-expanded={open}
-        className="inline-flex items-center gap-2 rounded-full hairline bg-surface/80 pl-1 pr-2.5 h-10 hover:bg-ink/5 transition-colors"
+        className="inline-flex items-center gap-2 rounded-full hairline bg-surface/80 pl-1 pr-2.5 h-11 hover:bg-ink/5 transition-colors"
       >
         {user.avatar && !imgError ? (
           // eslint-disable-next-line @next/next/no-img-element

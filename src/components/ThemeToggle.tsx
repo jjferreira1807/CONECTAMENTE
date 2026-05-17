@@ -41,7 +41,7 @@ export function ThemeToggle({ className }: { className?: string }) {
       aria-label={isDark ? "Mudar para tema claro" : "Mudar para tema escuro"}
       onClick={toggle}
       className={cn(
-        "inline-flex h-10 w-10 items-center justify-center rounded-full hairline bg-surface/80 text-ink transition-colors hover:bg-ink/5",
+        "inline-flex h-11 w-11 items-center justify-center rounded-full hairline bg-surface/80 text-ink transition-colors hover:bg-ink/5",
         className
       )}
     >

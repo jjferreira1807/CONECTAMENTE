@@ -137,10 +137,10 @@ export function OnboardingPlayer() {
         >
           {running ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5 translate-x-[1px]" />}
         </button>
-        <button onClick={() => go(-1)} aria-label="Capítulo anterior" className="rounded-full hairline h-10 w-10 flex items-center justify-center hover:bg-ink/5">
+        <button onClick={() => go(-1)} aria-label="Capítulo anterior" className="rounded-full hairline h-11 w-11 flex items-center justify-center hover:bg-ink/5">
           <ChevronLeft className="h-4 w-4" />
         </button>
-        <button onClick={() => go(1)} aria-label="Capítulo seguinte" className="rounded-full hairline h-10 w-10 flex items-center justify-center hover:bg-ink/5">
+        <button onClick={() => go(1)} aria-label="Capítulo seguinte" className="rounded-full hairline h-11 w-11 flex items-center justify-center hover:bg-ink/5">
           <ChevronRight className="h-4 w-4" />
         </button>
 
@@ -159,7 +159,7 @@ export function OnboardingPlayer() {
           onClick={() => setCaptions((v) => !v)}
           aria-label="Alternar legendas"
           className={cn(
-            "rounded-full h-10 w-10 flex items-center justify-center transition",
+            "rounded-full h-11 w-11 flex items-center justify-center transition",
             captions ? "bg-ink text-bg" : "hairline hover:bg-ink/5"
           )}
         >
@@ -174,7 +174,7 @@ export function OnboardingPlayer() {
             key={c.id}
             onClick={() => { setIdx(i); setT(c.seconds); }}
             className={cn(
-              "shrink-0 px-3 py-1.5 rounded-full text-xs transition",
+              "shrink-0 inline-flex items-center min-h-[44px] px-3 rounded-full text-xs transition",
               i === idx ? "bg-ink text-bg" : "bg-ink/5 hover:bg-ink/10 text-muted"
             )}
           >
