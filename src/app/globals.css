@@ -302,6 +302,18 @@ html.theme-switching *::after {
   50%      { opacity: 1;   transform: scale(1.15); }
 }
 
+/*
+ * `floaty` é referenciado em Atmosphere.tsx via `animation: floaty Xs ...`
+ * inline. Tailwind tem este keyframe no config mas o JIT só emite o @keyframes
+ * para a CSS final se a classe utility `.animate-floaty` aparecer no codebase
+ * — não aparece, portanto ficava tree-shaked. Declarar globalmente garante
+ * que as 4 partículas atmosféricas têm o drift subtil pretendido.
+ */
+@keyframes floaty {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-8px); }
+}
+
 /* Reduced motion ========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
