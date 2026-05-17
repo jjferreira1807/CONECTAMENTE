@@ -8,14 +8,14 @@
  * pre-paint logic) rather than `next/script`'s `beforeInteractive` strategy,
  * which ESLint flags outside `pages/_document`.
  */
+// The cutscene plays on every load (it's part of the product, not a
+// first-visit-only flourish). Only prefers-reduced-motion forces skip.
 const inlineScript = `
   try {
     var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     var url = new URL(window.location.href);
     var force = url.searchParams.get('intro') === '1';
-    var seen = false;
-    try { seen = localStorage.getItem('conectamente.introSeen.v2') === '1'; } catch (e) {}
-    document.documentElement.dataset.intro = (reduced || (seen && !force)) ? 'skip' : 'play';
+    document.documentElement.dataset.intro = (reduced && !force) ? 'skip' : 'play';
   } catch (e) {
     document.documentElement.dataset.intro = 'play';
   }

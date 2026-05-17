@@ -13,7 +13,7 @@ export default function StatsPage() {
       <header className="relative overflow-hidden">
         <div
           aria-hidden
-          className="absolute -top-32 left-1/3 w-[700px] h-[700px] rounded-full pointer-events-none"
+          className="absolute -top-32 left-1/3 w-[700px] h-[700px] rounded-full pointer-events-none dark:hidden"
           style={{
             background:
               "radial-gradient(closest-side, rgb(var(--accent-2) / 0.18), transparent 70%)",

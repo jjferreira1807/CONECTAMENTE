@@ -20,8 +20,12 @@ export function WorksheetView({ worksheet }: { worksheet: Worksheet }) {
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
+    // sessionStorage: o rascunho da ficha mantém-se enquanto a aba estiver
+    // aberta (útil para evitar perda se o utilizador imprimir ou voltar
+    // atrás), mas não persiste entre sessões — coerente com a regra
+    // "anónimo = primeira visita".
     try {
-      const raw = localStorage.getItem(storageKey);
+      const raw = sessionStorage.getItem(storageKey);
       if (raw) setData(JSON.parse(raw));
     } catch {}
     setHydrated(true);
@@ -29,7 +33,7 @@ export function WorksheetView({ worksheet }: { worksheet: Worksheet }) {
 
   useEffect(() => {
     if (!hydrated) return;
-    try { localStorage.setItem(storageKey, JSON.stringify(data)); } catch {}
+    try { sessionStorage.setItem(storageKey, JSON.stringify(data)); } catch {}
   }, [hydrated, data, storageKey]);
 
   const reset = () => { setData({}); };

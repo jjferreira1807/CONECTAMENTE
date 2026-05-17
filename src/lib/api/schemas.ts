@@ -73,16 +73,9 @@ export const downloadSchema = z.object({
   format: z.enum(["pdf", "html", "print"]).default("pdf"),
 });
 
-export const profileUpdateSchema = z.object({
-  display_name: z.string().min(1).max(80).nullable().optional(),
-  avatar_url: z.string().url().max(500).nullable().optional(),
-  locale: z.string().min(2).max(10).optional(),
-  timezone: z.string().min(1).max(64).optional(),
-  reminder_hour: z.number().int().min(0).max(23).nullable().optional(),
-  reminder_enabled: z.boolean().optional(),
-  reduced_motion: z.boolean().optional(),
-  onboarding_state: z.enum(["pending", "started", "completed"]).optional(),
-});
+// No profileUpdateSchema: we deliberately don't keep a profile table.
+// The user's identity is just their Supabase `user_id`; nothing else is
+// replicated from Google or asked of them.
 
 export const notificationCreateSchema = z.object({
   kind: z.enum(["reminder", "intention", "streak", "system", "episode"]).default("system"),

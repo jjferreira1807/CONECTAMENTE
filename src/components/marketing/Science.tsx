@@ -40,9 +40,9 @@ export function Science() {
             Conteúdo psicoeducativo,<br /> com referências reais.
           </h2>
           <p className="prose-soft mt-4">
-            Não somos um substituto de terapia clínica — e dizemo-lo abertamente.
-            Mas todo o conteúdo é construído a partir de literatura revista por
-            pares, traduzido para PT-PT acessível.
+            Não somos um substituto de acompanhamento profissional — e dizemo-lo
+            abertamente. Mas cada exercício e cada ideia parte de literatura revista
+            por pares, traduzida para PT-PT acessível e aplicável no dia-a-dia.
           </p>
         </div>
 

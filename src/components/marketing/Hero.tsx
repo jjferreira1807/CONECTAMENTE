@@ -30,10 +30,10 @@ export function Hero() {
       ref={ref}
       className="relative pt-12 md:pt-20 pb-24 md:pb-36 overflow-hidden"
     >
-      {/* Aurora — parallax */}
+      {/* Aurora — parallax. Hidden em dark mode para um fundo plano e coeso. */}
       <motion.div
         aria-hidden
-        className="absolute inset-0 -z-10 pointer-events-none"
+        className="absolute inset-0 -z-10 pointer-events-none dark:hidden"
         style={{ y: orbY }}
       >
         <div
@@ -91,9 +91,9 @@ export function Hero() {
             variants={fadeUp}
             className="prose-soft mt-6 text-lg md:text-xl max-w-xl"
           >
-            Sem extremos. Sem culpa. Um caminho guiado, baseado em Terapia
-            Cognitivo-Comportamental, para adultos que sentem que o telemóvel
-            ocupa demasiado espaço no dia — e no sono.
+            Sem extremos. Sem culpa. Um programa guiado de equilíbrio digital,
+            com estratégias práticas inspiradas em TCC, para adultos que sentem
+            que o telemóvel ocupa demasiado espaço no dia — e no sono.
           </motion.p>
 
           <motion.div variants={fadeUp} className="mt-9 flex flex-wrap items-center gap-3">

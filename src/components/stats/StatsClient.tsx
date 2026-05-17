@@ -5,8 +5,11 @@ import { useProgress } from "@/lib/store";
 import { episodes } from "@/content/episodes";
 import { Card } from "@/components/ui/Card";
 import { ProgressRing } from "@/components/episode/ProgressRing";
+import { AssessmentEvolution } from "@/components/assessment/AssessmentEvolution";
+import { Reveal } from "@/components/ui/Reveal";
+import { useAnimatedNumber } from "@/lib/useAnimatedNumber";
 import {
-  ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid, ReferenceLine,
+  ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ReferenceLine,
 } from "recharts";
 import { CalendarHeart, Sparkles, TrendingUp } from "lucide-react";
 
@@ -23,6 +26,7 @@ export function StatsClient() {
   const intentions = useProgress((s) => s.intentions);
   const streak = useProgress((s) => s.streak());
   const hydrated = useProgress((s) => s.hydrated);
+  const assessments = useProgress((s) => s.assessments);
 
   const data = useMemo(
     () =>
@@ -43,20 +47,28 @@ export function StatsClient() {
 
   if (!hydrated) return <Skeleton />;
 
-  if (checkIns.length === 0 && completed === 0) {
+  if (checkIns.length === 0 && completed === 0 && assessments.length === 0) {
     return (
-      <Card>
-        <p className="prose-soft">
-          Ainda não há dados para mostrar. Faz o primeiro check-in no{" "}
-          <a href="/dashboard" className="underline">dashboard</a>, ou começa o{" "}
-          <a href="/programa/bem-vindo" className="underline">episódio 1</a>.
-        </p>
-      </Card>
+      <div className="space-y-5">
+        <AssessmentEvolution />
+        <Card>
+          <p className="prose-soft">
+            Ainda não há dados para mostrar. Faz o primeiro check-in no{" "}
+            <a href="/dashboard" className="underline">dashboard</a>, ou começa o{" "}
+            <a href="/programa/bem-vindo" className="underline">episódio 1</a>.
+          </p>
+        </Card>
+      </div>
     );
   }
 
   return (
     <>
+      {/* Auto-reflexão · evolução */}
+      <Reveal className="mb-5">
+        <AssessmentEvolution />
+      </Reveal>
+
       {/* KPI strip */}
       <motion.div
         initial="hidden"
@@ -65,14 +77,14 @@ export function StatsClient() {
         variants={{ show: { transition: { staggerChildren: 0.08 } } }}
         className="grid grid-cols-2 md:grid-cols-4 gap-px bg-border/50 rounded-3xl overflow-hidden hairline backdrop-blur-md"
       >
-        <Kpi label="Programa" value={`${completed}/${total}`} sub="episódios" />
-        <Kpi label="Sequência" value={`${streak}d`} sub="check-ins seguidos" />
-        <Kpi label="Humor médio" value={String(avgMood)} sub="todos os check-ins" />
-        <Kpi label="Intenções cumpridas" value={String(intentionsDone)} sub={`em ${intentions.length} dias`} />
+        <Kpi label="Programa" numericValue={completed} format={(n) => `${n}/${total}`} sub="episódios" />
+        <Kpi label="Sequência" numericValue={streak} format={(n) => `${n}d`} sub="check-ins seguidos" />
+        <Kpi label="Humor médio" numericValue={typeof avgMood === "string" && avgMood !== "—" ? Number(avgMood) : 0} decimals={1} format={(n) => (checkIns.length ? n.toFixed(1) : "—")} sub="todos os check-ins" />
+        <Kpi label="Intenções cumpridas" numericValue={intentionsDone} sub={`em ${intentions.length} dias`} />
       </motion.div>
 
       {/* Chart + ring */}
-      <div className="mt-6 grid gap-5 lg:grid-cols-3">
+      <Reveal className="mt-6 grid gap-5 lg:grid-cols-3">
         <Card className="lg:col-span-2 overflow-hidden relative">
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div>
@@ -86,17 +98,7 @@ export function StatsClient() {
 
           <div className="mt-6 h-72 -mx-2">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={data} margin={{ top: 10, right: 16, left: -10, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="humorFill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="rgb(var(--accent))" stopOpacity={0.5} />
-                    <stop offset="100%" stopColor="rgb(var(--accent))" stopOpacity={0} />
-                  </linearGradient>
-                  <linearGradient id="energiaFill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="rgb(var(--accent-2))" stopOpacity={0.4} />
-                    <stop offset="100%" stopColor="rgb(var(--accent-2))" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
+              <LineChart data={data} margin={{ top: 10, right: 16, left: -10, bottom: 0 }}>
                 <CartesianGrid stroke="rgb(var(--border) / 0.5)" strokeDasharray="2 4" vertical={false} />
                 <XAxis
                   dataKey="date"
@@ -124,23 +126,23 @@ export function StatsClient() {
                   }}
                   cursor={{ stroke: "rgb(var(--border))", strokeWidth: 1 }}
                 />
-                <Area
+                <Line
                   type="monotone"
                   dataKey="humor"
                   stroke="rgb(var(--accent))"
                   strokeWidth={2.5}
-                  fill="url(#humorFill)"
-                  activeDot={{ r: 4, fill: "rgb(var(--accent))", stroke: "rgb(var(--bg))", strokeWidth: 2 }}
+                  dot={{ r: 3, fill: "rgb(var(--accent))", strokeWidth: 0 }}
+                  activeDot={{ r: 5, fill: "rgb(var(--accent))", stroke: "rgb(var(--bg))", strokeWidth: 2 }}
                 />
-                <Area
+                <Line
                   type="monotone"
                   dataKey="energia"
                   stroke="rgb(var(--accent-2))"
                   strokeWidth={2.5}
-                  fill="url(#energiaFill)"
-                  activeDot={{ r: 4, fill: "rgb(var(--accent-2))", stroke: "rgb(var(--bg))", strokeWidth: 2 }}
+                  dot={{ r: 3, fill: "rgb(var(--accent-2))", strokeWidth: 0 }}
+                  activeDot={{ r: 5, fill: "rgb(var(--accent-2))", stroke: "rgb(var(--bg))", strokeWidth: 2 }}
                 />
-              </AreaChart>
+              </LineChart>
             </ResponsiveContainer>
           </div>
         </Card>
@@ -158,9 +160,10 @@ export function StatsClient() {
             Repetir um episódio que ressoou é encorajado — as ideias só se assentam com prática.
           </p>
         </Card>
-      </div>
+      </Reveal>
 
       {/* Intentions log */}
+      <Reveal delay={0.08}>
       <Card className="mt-5">
         <p className="text-xs uppercase tracking-[0.25em] text-accent inline-flex items-center gap-1.5">
           <CalendarHeart className="h-3 w-3" /> Intenções recentes
@@ -184,13 +187,40 @@ export function StatsClient() {
           )}
         </ul>
       </Card>
+      </Reveal>
     </>
   );
 }
 
 /* ------------------------------------------------------------------------ */
 
-function Kpi({ label, value, sub }: { label: string; value: string; sub?: string }) {
+function Kpi({
+  label,
+  value,
+  numericValue,
+  format,
+  decimals = 0,
+  sub,
+}: {
+  label: string;
+  value?: string;                       // backwards-compat for static values
+  numericValue?: number;                // when present, animates count-up
+  format?: (n: number) => string;       // custom display formatter
+  decimals?: number;                    // tween precision
+  sub?: string;
+}) {
+  // Count-up only fires when a numericValue is given. The hook respects
+  // prefers-reduced-motion internally — no extra plumbing needed here.
+  const animated = useAnimatedNumber(numericValue ?? 0, {
+    enabled: numericValue !== undefined,
+    decimals,
+  });
+  const display =
+    numericValue !== undefined
+      ? format
+        ? format(animated)
+        : String(animated)
+      : (value ?? "");
   return (
     <motion.div
       variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}
@@ -198,7 +228,7 @@ function Kpi({ label, value, sub }: { label: string; value: string; sub?: string
       className="bg-bg/70 p-5 md:p-6"
     >
       <p className="text-xs uppercase tracking-[0.2em] text-muted">{label}</p>
-      <p className="font-serif text-3xl md:text-4xl mt-2 tabular-nums">{value}</p>
+      <p className="font-serif text-3xl md:text-4xl mt-2 tabular-nums">{display}</p>
       {sub && <p className="text-xs text-muted mt-1">{sub}</p>}
     </motion.div>
   );

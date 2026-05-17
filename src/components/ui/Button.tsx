@@ -16,11 +16,11 @@ const variants: Record<Variant, string> = {
   premium:
     "relative bg-gradient-to-br from-accent to-accent2 text-bg shadow-ambient hover:brightness-110 active:scale-[0.97]",
   ghost:
-    "bg-transparent text-ink hover:bg-ink/5",
+    "bg-transparent text-ink hover:bg-ink/5 active:scale-[0.97]",
   outline:
-    "bg-transparent text-ink hairline hover:bg-ink/5 backdrop-blur",
+    "bg-transparent text-ink hairline hover:bg-ink/5 backdrop-blur active:scale-[0.97]",
   subtle:
-    "bg-ink/5 text-ink hover:bg-ink/10 backdrop-blur",
+    "bg-ink/5 text-ink hover:bg-ink/10 backdrop-blur active:scale-[0.97]",
 };
 
 const sizes: Record<Size, string> = {

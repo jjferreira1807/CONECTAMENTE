@@ -8,9 +8,10 @@
  *  - Higiene de sono (Walker, Espie)
  *  - Neurociência da recompensa (Volkow, Lembke "Dopamine Nation")
  *
- * IMPORTANTE: este conteúdo é psicoeducativo e não substitui terapia clínica.
- * Cada episódio é independente da implementação visual — o renderer mapeia
- * `kind` para o componente certo.
+ * IMPORTANTE: este conteúdo é psicoeducativo e não substitui acompanhamento
+ * profissional. É um programa de autorregulação e bem-estar digital, não um
+ * sistema de avaliação ou tratamento. Cada episódio é independente da
+ * implementação visual — o renderer mapeia `kind` para o componente certo.
  */
 
 export type SectionKind =
@@ -289,13 +290,13 @@ export const episodes: Episode[] = [
 
   /* ───────────────────────── 06 ───────────────────────── */
   {
-    slug: "dependencia-cerebro",
+    slug: "recompensa-cerebro",
     number: 6,
-    kicker: "Dependência · parte I",
+    kicker: "Recompensa · parte I",
     title: "O cérebro e o circuito da recompensa",
     subtitle: "Dopamina, novidade e por que tudo isto é tão difícil",
     description:
-      "Neurociência acessível: como apps e redes activam o mesmo circuito que substâncias — e por que isso não é uma sentença.",
+      "Neurociência acessível: como apps e redes activam o circuito da recompensa — e por que isso não é uma sentença.",
     durationMin: 18,
     themeColor: "from-accent/35 to-accent2/15",
     sections: [
@@ -304,9 +305,9 @@ export const episodes: Episode[] = [
         kind: "text",
         title: "Dopamina não é “prazer”. É “querer mais”.",
         body: [
-          "Confunde-se muitas vezes dopamina com prazer. Os neurocientistas (Robinson, Berridge) mostram que ela está antes do prazer — sinaliza <em>antecipação</em> e <em>busca</em>. É o que nos faz puxar a alavanca outra vez, mesmo quando o prémio já não é grande.",
+          "Confunde-se muitas vezes dopamina com prazer. Os trabalhos de Robinson e Berridge mostram que ela está antes do prazer — sinaliza <em>antecipação</em> e <em>busca</em>. É o que nos faz puxar a alavanca outra vez, mesmo quando o prémio já não é grande.",
           "As redes sociais e o conteúdo curto exploram isto magistralmente: cada deslize é um “talvez”. Recompensa <strong>variável</strong>, exactamente como uma slot machine. O cérebro adora — e cansa-se.",
-          "Anna Lembke (em <em>Dopamine Nation</em>) explica: a alta dopaminérgica repetida força um reequilíbrio — depois sentimos menos prazer em coisas normais (livro, conversa, caminhada). É reversível, mas requer um período de “reinício”.",
+          "Anna Lembke (em <em>Dopamine Nation</em>) descreve o padrão: a alta dopaminérgica repetida força um reequilíbrio — depois sentimos menos prazer em coisas normais (livro, conversa, caminhada). É reversível, mas requer um período de “reinício”.",
         ],
       },
       {
@@ -331,13 +332,13 @@ export const episodes: Episode[] = [
 
   /* ───────────────────────── 07 ───────────────────────── */
   {
-    slug: "dependencia-tecnicas",
+    slug: "recompensa-tecnicas",
     number: 7,
-    kicker: "Dependência · parte II",
-    title: "Técnicas práticas de redução",
-    subtitle: "Janelas digitais, jejum dopaminérgico realista, regras de uso",
+    kicker: "Recompensa · parte II",
+    title: "Técnicas práticas de equilíbrio",
+    subtitle: "Janelas digitais, pausas realistas e regras de uso",
     description:
-      "Estratégias estruturadas que funcionam para a maioria dos adultos sem proibições absurdas.",
+      "Estratégias estruturadas para encontrar equilíbrio digital, sem proibições absurdas.",
     durationMin: 20,
     themeColor: "from-accent/30 to-accent2/20",
     sections: [
@@ -346,7 +347,7 @@ export const episodes: Episode[] = [
         kind: "text",
         title: "Dieta, não jejum",
         body: [
-          "Esquece a “desintoxicação total”. Para a maioria das pessoas, é insustentável e dispara o efeito rebound. Pensa antes em <strong>janelas</strong>: períodos definidos onde a internet recreativa entra, e períodos onde não.",
+          "Esquece a “limpeza total”. Para a maioria das pessoas é insustentável — e o uso costuma voltar com mais força depois. Pensa antes em <strong>janelas</strong>: períodos definidos onde a internet recreativa entra, e períodos onde não.",
           "Modelo simples e testado:",
           "<ul class='list-disc pl-5 space-y-1 mt-2'><li><strong>Manhã selvagem</strong> — primeiros 60 min sem ecrãs.</li><li><strong>Janela do meio-dia</strong> — 20 min para redes/recreativo, à hora de almoço.</li><li><strong>Janela da noite</strong> — 30 min antes do jantar.</li><li><strong>Cortina das 22h</strong> — telemóvel fora do quarto.</li></ul>",
           "A regra interna: enquanto não estiveres em janela, o telemóvel só serve funções <em>instrumentais</em> (mapas, mensagens essenciais, fotografar). Sem feeds, sem stories, sem buracos de YouTube.",
@@ -379,7 +380,7 @@ export const episodes: Episode[] = [
     title: "Reaprender a estar com pessoas",
     subtitle: "A diferença entre conexão online e contacto humano",
     description:
-      "O paradoxo da hiperconexão: estar sempre online e sentir-se só. O que a investigação mostra e como começar pequeno.",
+      "O paradoxo da hiperconexão: estar sempre online e sentir-se só. O que se sabe sobre conexão real — e como começar pequeno.",
     durationMin: 17,
     themeColor: "from-accent/25 to-accent2/25",
     sections: [

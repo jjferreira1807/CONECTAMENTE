@@ -32,6 +32,22 @@ export type Intention = {
   done?: boolean;
 };
 
+/**
+ * Auto-reflexão · resultado de uma toma do questionário inicial.
+ *
+ * A história completa fica guardada (não apenas o último) para que a página
+ * de progresso possa comparar pré × pós quando o utilizador refizer o quiz
+ * depois do programa. `kind` distingue a baseline (primeira toma) de tomas
+ * subsequentes — útil para visualizar evolução sem ambiguidades.
+ */
+export type AssessmentSnapshot = {
+  takenAt: string;       // ISO timestamp
+  answers: number[];     // length = ASSESSMENT_QUESTIONS.length, each 0–4
+  score: number;         // sum of answers
+  bandId: "equilibrio" | "fadiga" | "excessivo" | "sobrecarga";
+  kind: "baseline" | "followup";
+};
+
 interface ProgressState {
   hydrated: boolean;
   setHydrated: (v: boolean) => void;
@@ -50,6 +66,11 @@ interface ProgressState {
   intentions: Intention[];
   setIntentionForToday: (text: string) => void;
   toggleIntention: (date: string) => void;
+
+  assessments: AssessmentSnapshot[];
+  saveAssessment: (s: Omit<AssessmentSnapshot, "kind"> & { kind?: AssessmentSnapshot["kind"] }) => void;
+  latestAssessment: () => AssessmentSnapshot | undefined;
+  baselineAssessment: () => AssessmentSnapshot | undefined;
 
   streak: () => number;
 }
@@ -160,6 +181,23 @@ export const useProgress = create<ProgressState>()(
           ),
         })),
 
+      assessments: [],
+      saveAssessment: (s) => {
+        set((state) => {
+          // First snapshot is always the baseline; subsequent default to followup.
+          const kind: AssessmentSnapshot["kind"] =
+            s.kind ?? (state.assessments.length === 0 ? "baseline" : "followup");
+          return {
+            assessments: [...state.assessments, { ...s, kind }],
+          };
+        });
+      },
+      latestAssessment: () => {
+        const list = get().assessments;
+        return list[list.length - 1];
+      },
+      baselineAssessment: () => get().assessments.find((a) => a.kind === "baseline"),
+
       streak: () => {
         const { checkIns } = get();
         if (!checkIns.length) return 0;
@@ -177,8 +215,37 @@ export const useProgress = create<ProgressState>()(
     }),
     {
       name: "conectamente.progress.v1",
-      storage: createJSONStorage(() => localStorage),
+      // Anónimo = experiência efémera por design: a persistência usa
+      // sessionStorage, que limpa quando o utilizador fecha a aba. Quando
+      // há sessão Google autenticada, o `useRemoteSync` puxa os dados do
+      // Supabase no mount e popula a store — restauro completo sem
+      // depender de nada local. Pediu-se explicitamente que utilizadores
+      // anónimos não acumulem progresso entre visitas.
+      storage: createJSONStorage(() =>
+        typeof window === "undefined"
+          ? (undefined as unknown as Storage)
+          : window.sessionStorage,
+      ),
       onRehydrateStorage: () => (state) => state?.setHydrated(true),
     }
   )
 );
+
+/**
+ * Limpa todo o estado do progresso. Chamada no fluxo de logout para evitar
+ * que dados da conta anterior fiquem visíveis para a próxima sessão (anónima
+ * ou nova conta) no mesmo tab.
+ */
+export function resetProgressStore() {
+  useProgress.setState({
+    episodes: {},
+    checkIns: [],
+    intentions: [],
+    assessments: [],
+  });
+  if (typeof window !== "undefined") {
+    try {
+      window.sessionStorage.removeItem("conectamente.progress.v1");
+    } catch {}
+  }
+}

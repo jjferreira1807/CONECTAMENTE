@@ -10,7 +10,9 @@ import { Atmosphere } from "@/components/Atmosphere";
 import { IntroCutscene } from "@/components/IntroCutscene";
 import { IntroBlocker } from "@/components/IntroBlocker";
 import { PageTransition } from "@/components/PageTransition";
+import { NavProgress } from "@/components/NavProgress";
 import { AppReadyProvider } from "@/components/AppReady";
+import { QuizGate } from "@/components/QuizGate";
 
 // Explicit weights + extended Latin (PT-PT diacritics). Specifying weights
 // helps next/font pre-compute size-adjusted fallbacks accurately, eliminating
@@ -39,10 +41,11 @@ export const metadata: Metadata = {
     template: "%s · Conectamente",
   },
   description:
-    "Programa digital de bem-estar baseado em Terapia Cognitivo-Comportamental para adultos com uso excessivo da internet, ansiedade, isolamento e dificuldades de sono.",
+    "Programa digital psicoeducativo de equilíbrio e bem-estar digital, com estratégias inspiradas em TCC, para adultos que sentem que passam tempo a mais online, dormem mal ou querem reaprender a estar presentes.",
   keywords: [
-    "uso excessivo da internet", "TCC", "terapia cognitivo-comportamental",
-    "saúde mental", "ansiedade", "sono", "mindfulness", "Portugal",
+    "uso excessivo da internet", "equilíbrio digital", "bem-estar digital",
+    "autorregulação", "hábitos digitais", "TCC", "ansiedade", "sono",
+    "mindfulness", "Portugal",
   ],
   authors: [{ name: "Conectamente" }],
   openGraph: {
@@ -61,10 +64,10 @@ export const metadata: Metadata = {
   },
   alternates: { canonical: "/" },
   icons: { icon: "/favicon.svg" },
-  colorScheme: "dark light",
 };
 
 export const viewport: Viewport = {
+  colorScheme: "dark light",
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#F6F2EB" },
     { media: "(prefers-color-scheme: dark)", color: "#06090E" },
@@ -100,7 +103,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Suspense fallback={null}>
               <IntroCutscene />
             </Suspense>
+            {/* QuizGate uses usePathname → also needs Suspense for the same
+                reason. Mounts after the cutscene; redirects to /auto-reflexao
+                once AppReady fires, except on the quiz itself and on auth
+                callback routes. */}
+            <Suspense fallback={null}>
+              <QuizGate />
+            </Suspense>
             <SiteHeader />
+            <NavProgress />
             <main id="main" className="pt-20">
               <PageTransition>{children}</PageTransition>
             </main>

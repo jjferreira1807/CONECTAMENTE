@@ -147,10 +147,10 @@ export function DashboardClient() {
 function Hero() {
   return (
     <header className="relative overflow-hidden rounded-3xl border border-border/60 backdrop-blur-md p-7 md:p-10">
-      {/* Ambient layer */}
+      {/* Ambient layer — escondido em dark para fundo coeso. */}
       <div
         aria-hidden
-        className="absolute inset-0 -z-10"
+        className="absolute inset-0 -z-10 dark:hidden"
         style={{
           background:
             "radial-gradient(60% 80% at 0% 0%, rgb(var(--accent) / 0.18), transparent 70%), radial-gradient(50% 70% at 100% 100%, rgb(var(--accent-2) / 0.18), transparent 70%), rgb(var(--surface) / 0.5)",
@@ -158,7 +158,7 @@ function Hero() {
       />
       <motion.div
         aria-hidden
-        className="absolute -top-24 right-[-10%] w-[420px] h-[420px] rounded-full pointer-events-none"
+        className="absolute -top-24 right-[-10%] w-[420px] h-[420px] rounded-full pointer-events-none dark:hidden"
         style={{
           background:
             "radial-gradient(closest-side, rgb(var(--accent) / 0.22), transparent 70%)",

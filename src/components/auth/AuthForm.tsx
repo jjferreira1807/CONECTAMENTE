@@ -57,11 +57,26 @@ export function AuthForm() {
   async function onGoogle() {
     if (!supabaseConfigured) return setError("Auth não configurada.");
     const supabase = getSupabaseBrowser(); if (!supabase) return;
+    // Feedback imediato: o botão fica disabled antes do browser navegar para
+    // o Google (~100-300ms). Sem isto, o utilizador não tem sinal de que o
+    // clique registou. Se a navegação ocorrer, este estado fica "preso" em
+    // loading — mas o componente desmonta quando o browser sai do domínio,
+    // por isso não há flash de volta ao estado idle.
+    setError(null);
+    setLoading(true);
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: `${window.location.origin}/auth/callback?next=/dashboard` },
+      // Login OAuth aterra primeiro no quiz de auto-reflexão (baseline na
+      // primeira visita, follow-up nas seguintes) — depois o utilizador
+      // segue para o programa/dashboard. Apontar o `next` directamente
+      // para /auto-reflexao evita o flicker de passar por /dashboard antes
+      // do QuizGate corrigir a rota.
+      options: { redirectTo: `${window.location.origin}/auth/callback?next=/auto-reflexao` },
     });
-    if (error) setError(error.message);
+    if (error) {
+      setError(error.message);
+      setLoading(false);
+    }
   }
 
   async function onRecover() {
@@ -106,7 +121,9 @@ export function AuthForm() {
 
       <button
         type="button" onClick={onGoogle}
-        className="w-full mb-4 inline-flex items-center justify-center gap-2 rounded-full hairline h-11 text-sm font-medium hover:bg-ink/5"
+        disabled={loading}
+        aria-busy={loading}
+        className="w-full mb-4 inline-flex items-center justify-center gap-2 rounded-full hairline h-11 text-sm font-medium hover:bg-ink/5 disabled:cursor-wait disabled:opacity-70"
       >
         <GoogleIcon /> Continuar com Google
       </button>

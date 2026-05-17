@@ -31,23 +31,10 @@ export type EventKind =
   | "exercise_save" | "reflection_save" | "mood_save" | "intention_save"
   | "download" | "auth_login" | "auth_signup" | "auth_signout" | "error_client";
 
-export type OnboardingState = "pending" | "started" | "completed";
+// No `ProfileRow` / `OnboardingState`: there is no profile table. The user's
+// identity is just their Supabase auth UUID — nothing else replicated.
 
 // ---- Row shapes ------------------------------------------------------------
-
-export interface ProfileRow {
-  id: string;
-  display_name: string | null;
-  avatar_url: string | null;
-  locale: string;
-  timezone: string;
-  reminder_hour: number | null;
-  reminder_enabled: boolean;
-  reduced_motion: boolean;
-  onboarding_state: OnboardingState;
-  created_at: string;
-  updated_at: string;
-}
 
 export interface EpisodeRow {
   id: string;
@@ -199,7 +186,6 @@ type Table<R, RequiredInsert = Record<string, never>> = {
 export interface Database {
   public: {
     Tables: {
-      profiles:         Table<ProfileRow,         { id: string }>;
       episodes:         Table<EpisodeRow,         { slug: string; number: number; kicker: string; title: string }>;
       sections:         Table<SectionRow,         { episode_id: string; external_id: string; kind: SectionKind }>;
       user_progress:    Table<UserProgressRow,    { user_id: string; episode_slug: string }>;

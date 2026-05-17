@@ -31,14 +31,16 @@ const COLOR = {
 
 const styles = StyleSheet.create({
   page: {
-    paddingTop: 40,
-    paddingBottom: 48,
-    paddingHorizontal: 48,
+    paddingTop: 44,
+    paddingBottom: 56,
+    paddingHorizontal: 52,
     backgroundColor: COLOR.paper,
     color: COLOR.ink,
     fontFamily: "Helvetica",
     fontSize: 10.5,
-    lineHeight: 1.5,
+    // No page-level lineHeight: it propagates to every Text and breaks the
+    // line-box maths for elements with very different fontSizes (title vs
+    // body). Each Text now sets its own lineHeight explicitly.
   },
 
   // Header
@@ -46,7 +48,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 28,
+    marginBottom: 36,
   },
   brand: {
     fontFamily: "Helvetica",
@@ -54,11 +56,13 @@ const styles = StyleSheet.create({
     letterSpacing: 4,
     color: COLOR.muted,
     textTransform: "uppercase",
+    lineHeight: 1.2,
   },
   date: {
     fontFamily: "Helvetica",
     fontSize: 9,
     color: COLOR.muted,
+    lineHeight: 1.2,
   },
 
   // Title block
@@ -68,106 +72,148 @@ const styles = StyleSheet.create({
     color: COLOR.accent,
     letterSpacing: 3,
     textTransform: "uppercase",
-    marginBottom: 6,
+    marginBottom: 10,
+    lineHeight: 1.2,
   },
+  // Explicit lineHeight so the title's bottom line-box descends only ~12pt
+  // below the baseline, leaving clean room for the subtitle. The previous
+  // inherited 1.5 line-height was crashing the subtitle into the title.
   title: {
     fontFamily: "Times-Roman",
-    fontSize: 26,
+    fontSize: 28,
     color: COLOR.ink,
-    letterSpacing: -0.5,
+    letterSpacing: -0.4,
+    lineHeight: 1.12,
+    marginBottom: 12,
   },
   subtitle: {
     fontFamily: "Helvetica",
-    fontSize: 11,
+    fontSize: 10.5,
     color: COLOR.muted,
-    marginTop: 8,
-    maxWidth: 420,
+    maxWidth: 440,
+    lineHeight: 1.55,
   },
 
   // Divider
   divider: {
     height: 1,
     backgroundColor: COLOR.hair,
-    marginVertical: 22,
+    marginVertical: 24,
   },
 
   // Mood section
+  moodSection: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: COLOR.hair,
+    paddingHorizontal: 22,
+    paddingVertical: 18,
+  },
+  moodSectionLabel: {
+    fontFamily: "Helvetica-Bold",
+    fontSize: 9,
+    color: COLOR.muted,
+    letterSpacing: 2,
+    textTransform: "uppercase",
+    marginBottom: 14,
+    lineHeight: 1.2,
+  },
   moodRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    marginBottom: 12,
   },
   moodLabel: {
     fontFamily: "Times-Roman",
-    fontSize: 13,
+    fontSize: 12.5,
     color: COLOR.ink,
-    width: 130,
+    width: 150,
+    lineHeight: 1.2,
   },
   moodBullets: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 9,
+    gap: 10,
   },
   moodBullet: {
-    width: 18, height: 18,
-    borderRadius: 9,
+    width: 22, height: 22,
+    borderRadius: 11,
     borderWidth: 1,
     borderColor: COLOR.hair,
+    alignItems: "center",
+    justifyContent: "center",
   },
-  moodCaption: {
+  moodBulletText: {
     fontFamily: "Helvetica",
     fontSize: 9,
     color: COLOR.muted,
-    marginLeft: 10,
+    lineHeight: 1,
+  },
+  moodBulletTextFilled: {
+    color: "#FFFFFF",
+  },
+  moodLegend: {
+    fontFamily: "Helvetica",
+    fontSize: 8.5,
+    color: COLOR.muted,
+    marginTop: 2,
+    textAlign: "right",
+    letterSpacing: 0.5,
+    lineHeight: 1.2,
   },
 
   // Fields
   fieldGroup: { marginBottom: 18 },
   fieldLabel: {
     fontFamily: "Helvetica-Bold",
-    fontSize: 10,
+    fontSize: 9.5,
     color: COLOR.ink,
     marginBottom: 4,
-    letterSpacing: 0.2,
+    letterSpacing: 0.3,
+    textTransform: "uppercase",
+    lineHeight: 1.3,
   },
   fieldHint: {
     fontFamily: "Helvetica-Oblique",
     fontSize: 9,
     color: COLOR.muted,
     marginBottom: 8,
+    lineHeight: 1.3,
   },
-  // Lined fill-in area (uses faint underlines)
   fillArea: {
     flexDirection: "column",
     gap: 14,
-    marginTop: 4,
+    marginTop: 6,
   },
   fillLine: {
     height: 1,
     backgroundColor: COLOR.hair,
   },
-  // Pre-filled value when answers are provided
   fieldValue: {
     fontFamily: "Helvetica",
     fontSize: 10.5,
     color: COLOR.ink,
     lineHeight: 1.55,
+    marginTop: 2,
   },
 
-  // Card / panel
+  // Panel / card
   panel: {
     backgroundColor: "#FFFFFF",
     borderRadius: 12,
     borderWidth: 1,
     borderColor: COLOR.hair,
     padding: 18,
-    marginVertical: 12,
+    marginVertical: 14,
   },
   panelTitle: {
     fontFamily: "Times-Roman",
     fontSize: 13,
     color: COLOR.ink,
     marginBottom: 8,
+    lineHeight: 1.25,
   },
   panelBody: {
     fontFamily: "Helvetica",
@@ -176,12 +222,12 @@ const styles = StyleSheet.create({
     lineHeight: 1.6,
   },
 
-  // Mini exercise (breath)
+  // Breath panel
   breathPanel: {
     backgroundColor: COLOR.accentSoft,
     borderRadius: 14,
     padding: 18,
-    marginVertical: 14,
+    marginVertical: 16,
     flexDirection: "row",
     alignItems: "center",
     gap: 18,
@@ -191,9 +237,9 @@ const styles = StyleSheet.create({
   // Footer
   footer: {
     position: "absolute",
-    bottom: 24,
-    left: 48,
-    right: 48,
+    bottom: 28,
+    left: 52,
+    right: 52,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -204,6 +250,7 @@ const styles = StyleSheet.create({
     color: COLOR.muted,
     letterSpacing: 1.5,
     textTransform: "uppercase",
+    lineHeight: 1.2,
   },
 });
 
@@ -240,22 +287,31 @@ export function WorksheetPDF({
           <Text style={styles.date}>{dateLabel}</Text>
         </View>
 
-        {/* Title */}
-        <Text style={styles.kicker}>{worksheet.category.toUpperCase()}</Text>
-        <Text style={styles.title}>{worksheet.title}</Text>
-        <Text style={styles.subtitle}>{worksheet.intro}</Text>
+        {/* Title block */}
+        <View>
+          <Text style={styles.kicker}>{worksheet.category.toUpperCase()}</Text>
+          <Text style={styles.title}>{worksheet.title}</Text>
+          <Text style={styles.subtitle}>{worksheet.intro}</Text>
+        </View>
 
         <View style={styles.divider} />
 
-        {/* Mood pre/post */}
-        <View style={styles.moodRow}>
-          <Text style={styles.moodLabel}>Como me sinto antes</Text>
-          <MoodScale value={moodBefore} />
-        </View>
-        <View style={{ height: 12 }} />
-        <View style={styles.moodRow}>
-          <Text style={styles.moodLabel}>Como me sinto depois</Text>
-          <MoodScale value={moodAfter} />
+        {/* Mood pre/post — agrupado num só painel, com números nos círculos
+            e legenda única em baixo. Substitui a versão anterior em que cada
+            linha tinha o seu próprio "1 mal · 5 bem", criando ruído visual. */}
+        <View style={styles.moodSection}>
+          <Text style={styles.moodSectionLabel}>Estado emocional</Text>
+
+          <View style={styles.moodRow}>
+            <Text style={styles.moodLabel}>Como me sinto antes</Text>
+            <MoodScale value={moodBefore} />
+          </View>
+          <View style={styles.moodRow}>
+            <Text style={styles.moodLabel}>Como me sinto depois</Text>
+            <MoodScale value={moodAfter} />
+          </View>
+
+          <Text style={styles.moodLegend}>1 — muito mal · 5 — muito bem</Text>
         </View>
 
         <View style={styles.divider} />
@@ -269,7 +325,27 @@ export function WorksheetPDF({
               <Text style={styles.fieldLabel}>{f.label}</Text>
               {f.hint && <Text style={styles.fieldHint}>{f.hint}</Text>}
               {value ? (
-                <Text style={styles.fieldValue}>{value}</Text>
+                // Filled value gets a subtle amber rule on the left for
+                // hierarchy — distinguishes pre-filled answers from blank
+                // fill-lines without changing typography weight.
+                <View
+                  style={{
+                    flexDirection: "row",
+                    gap: 10,
+                    marginTop: 4,
+                    paddingLeft: 2,
+                  }}
+                >
+                  <View
+                    style={{
+                      width: 2,
+                      backgroundColor: COLOR.amber,
+                      borderRadius: 1,
+                      opacity: 0.65,
+                    }}
+                  />
+                  <Text style={[styles.fieldValue, { flex: 1 }]}>{value}</Text>
+                </View>
               ) : (
                 <View style={styles.fillArea}>
                   {Array.from({ length: rows }).map((_, i) => (
@@ -326,7 +402,7 @@ export function WorksheetPDF({
 
         {/* Footer */}
         <View fixed style={styles.footer}>
-          <Text style={styles.footerText}>Conteúdo psicoeducativo · não substitui acompanhamento clínico</Text>
+          <Text style={styles.footerText}>Psicoeducativo · não substitui acompanhamento profissional</Text>
           <Text style={styles.footerText}>conectamente.pt</Text>
         </View>
       </Page>
@@ -339,18 +415,29 @@ export function WorksheetPDF({
 function MoodScale({ value }: { value: number | null }) {
   return (
     <View style={styles.moodBullets}>
-      {[1, 2, 3, 4, 5].map((n) => (
-        <View
-          key={n}
-          style={[
-            styles.moodBullet,
-            value && value >= n
-              ? { backgroundColor: COLOR.amber, borderColor: COLOR.amber }
-              : {},
-          ]}
-        />
-      ))}
-      <Text style={styles.moodCaption}>1 mal · 5 bem</Text>
+      {[1, 2, 3, 4, 5].map((n) => {
+        const isFilled = value !== null && value !== undefined && value >= n;
+        return (
+          <View
+            key={n}
+            style={[
+              styles.moodBullet,
+              isFilled
+                ? { backgroundColor: COLOR.amber, borderColor: COLOR.amber }
+                : {},
+            ]}
+          >
+            <Text
+              style={[
+                styles.moodBulletText,
+                isFilled ? styles.moodBulletTextFilled : {},
+              ]}
+            >
+              {n}
+            </Text>
+          </View>
+        );
+      })}
     </View>
   );
 }

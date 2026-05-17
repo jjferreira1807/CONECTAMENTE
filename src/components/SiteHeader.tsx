@@ -2,11 +2,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 import { Button } from "./ui/Button";
 import { cn } from "@/lib/cn";
 import { Logomark } from "./brand/Logomark";
+import { useAppReady } from "./AppReady";
+import { UserChip, useSupabaseUser } from "./UserChip";
 
 const links = [
   { href: "/programa", label: "Programa" },
@@ -18,6 +21,8 @@ const links = [
 
 export function SiteHeader() {
   const pathname = usePathname();
+  const ready = useAppReady();
+  const { user, ready: authReady } = useSupabaseUser();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -31,7 +36,14 @@ export function SiteHeader() {
   useEffect(() => setOpen(false), [pathname]);
 
   return (
-    <header
+    // Header gated on AppReady so its entrance choreographs with the
+    // cutscene's dissolve — when the cutscene's backdrop fades, the header
+    // slides down + fades in over the same 800ms window. No more "pop in"
+    // seam between the intro and the website.
+    <motion.header
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: ready ? 1 : 0, y: ready ? 0 : -10 }}
+      transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
       className={cn(
         "fixed top-0 inset-x-0 z-40 transition-all duration-300",
         scrolled ? "py-2.5" : "py-4"
@@ -76,9 +88,13 @@ export function SiteHeader() {
 
           <div className="flex items-center gap-2">
             <ThemeToggle className="hidden md:inline-flex" />
-            <Link href="/entrar" className="hidden md:inline-flex">
-              <Button size="sm" variant="subtle">Entrar</Button>
-            </Link>
+            {authReady && user ? (
+              <UserChip className="hidden md:inline-flex" />
+            ) : (
+              <Link href="/entrar" className="hidden md:inline-flex">
+                <Button size="sm" variant="subtle">Entrar</Button>
+              </Link>
+            )}
             <Link href="/programa" className="hidden md:inline-flex">
               <Button size="sm" variant="premium">Começar</Button>
             </Link>
@@ -93,31 +109,48 @@ export function SiteHeader() {
           </div>
         </nav>
 
-        {open && (
-          <div className="md:hidden mt-2 glass rounded-2xl p-3 shadow-soft">
-            <ul className="flex flex-col">
-              {links.map((l) => (
-                <li key={l.href}>
-                  <Link
-                    href={l.href}
-                    className="block px-3 py-2.5 text-sm rounded-xl hover:bg-ink/5"
-                  >
-                    {l.label}
-                  </Link>
+        <AnimatePresence initial={false}>
+          {open && (
+            <motion.div
+              key="mobile-menu"
+              initial={{ opacity: 0, y: -8, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -6, scale: 0.98 }}
+              transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+              className="md:hidden mt-2 glass rounded-2xl p-3 shadow-soft origin-top"
+            >
+              <ul className="flex flex-col">
+                {links.map((l) => (
+                  <li key={l.href}>
+                    <Link
+                      href={l.href}
+                      className="block px-3 py-2.5 text-sm rounded-xl hover:bg-ink/5 active:bg-ink/10 transition-colors"
+                    >
+                      {l.label}
+                    </Link>
+                  </li>
+                ))}
+                <li className="flex items-center justify-between gap-2 px-3 pt-3 border-t border-border mt-2">
+                  <ThemeToggle />
+                  <div className="flex items-center gap-2">
+                    {authReady && user ? (
+                      <UserChip />
+                    ) : (
+                      <Link href="/entrar">
+                        <Button size="sm" variant="subtle">Entrar</Button>
+                      </Link>
+                    )}
+                    <Link href="/programa">
+                      <Button size="sm">Começar</Button>
+                    </Link>
+                  </div>
                 </li>
-              ))}
-              <li className="flex items-center justify-between px-3 pt-3 border-t border-border mt-2">
-                <ThemeToggle />
-                <div className="flex gap-2">
-                  <Link href="/entrar"><Button size="sm" variant="subtle">Entrar</Button></Link>
-                  <Link href="/programa"><Button size="sm">Começar</Button></Link>
-                </div>
-              </li>
-            </ul>
-          </div>
-        )}
+              </ul>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
-    </header>
+    </motion.header>
   );
 }
 

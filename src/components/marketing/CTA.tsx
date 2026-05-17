@@ -17,19 +17,19 @@ export function CTA() {
           variants={fadeUp}
           className="relative overflow-hidden rounded-[2rem] border border-border/60 backdrop-blur-md p-12 md:p-20 text-center"
         >
-          {/* Multi-layer gradient backdrop */}
+          {/* Multi-layer gradient backdrop — hidden em dark para fundo plano. */}
           <div
             aria-hidden
-            className="absolute inset-0 -z-10"
+            className="absolute inset-0 -z-10 dark:hidden"
             style={{
               background:
                 "radial-gradient(60% 80% at 30% 20%, rgb(var(--accent) / 0.18), transparent 70%), radial-gradient(50% 70% at 80% 80%, rgb(var(--accent-2) / 0.16), transparent 70%), rgb(var(--surface) / 0.5)",
             }}
           />
-          {/* Decorative orb */}
+          {/* Decorative orb — idem. */}
           <div
             aria-hidden
-            className="absolute -bottom-32 left-1/2 -translate-x-1/2 h-[480px] w-[480px] rounded-full opacity-60 pointer-events-none"
+            className="absolute -bottom-32 left-1/2 -translate-x-1/2 h-[480px] w-[480px] rounded-full opacity-60 pointer-events-none dark:hidden"
             style={{
               background:
                 "radial-gradient(closest-side, rgb(var(--accent-2) / 0.2), transparent 70%)",

@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 const linhas = [
   { name: "Emergência médica", phone: "112", note: "24 horas, em todo o país." },
-  { name: "SNS24", phone: "808 24 24 24", note: "Aconselhamento clínico, 24h." },
+  { name: "SNS24", phone: "808 24 24 24", note: "Aconselhamento de saúde, 24h." },
   { name: "SOS Voz Amiga", phone: "213 544 545", note: "Apoio emocional, 16h–24h." },
   { name: "SOS Voz Amiga (telemóvel)", phone: "912 802 669", note: "16h–24h." },
   { name: "Telefone da Amizade", phone: "228 323 535", note: "16h–23h." },

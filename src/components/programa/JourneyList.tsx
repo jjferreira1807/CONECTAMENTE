@@ -85,10 +85,10 @@ export function JourneyList({ episodes }: Props) {
                 "group"
               )}
             >
-              {/* Per-episode gradient strip */}
+              {/* Per-episode gradient strip — escondido em dark mode. */}
               <div
                 aria-hidden
-                className={"absolute inset-x-0 top-0 h-12 bg-gradient-to-r " + e.themeColor + " opacity-50 pointer-events-none"}
+                className={"absolute inset-x-0 top-0 h-12 bg-gradient-to-r " + e.themeColor + " opacity-50 pointer-events-none dark:hidden"}
               />
 
               <div className="relative p-6 md:p-7 flex items-start gap-5 md:gap-7">

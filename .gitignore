@@ -8,3 +8,4 @@ out
 .vscode
 .vercel
 *.tsbuildinfo
+supabase/.temp

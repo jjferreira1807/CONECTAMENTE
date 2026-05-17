@@ -46,25 +46,16 @@ export function AppReadyProvider({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    // Path 1: if the cutscene will NOT show (returning visitor / reduced
-    // motion / no localStorage), mark ready right away.
-    let force = false;
-    try {
-      const url = new URL(window.location.href);
-      force = url.searchParams.get("intro") === "1";
-    } catch {}
-
+    // The cutscene now plays on every load (no more `introSeen` gating —
+    // it's part of the product). Only prefers-reduced-motion shortcuts past
+    // it, since vestibular sensitivity is a real accessibility concern.
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    let seen = false;
-    try { seen = localStorage.getItem("conectamente.introSeen.v2") === "1"; } catch {}
-
-    if (reduced || (seen && !force)) {
+    if (reduced) {
       setReady(true);
       return;
     }
 
-    // Path 2: cutscene will play. Set a failsafe so a broken cutscene can't
-    // leave the app stuck invisible.
+    // Failsafe so a broken cutscene can't leave the app stuck invisible.
     const t = setTimeout(() => setReady(true), READY_FAILSAFE_MS);
     return () => clearTimeout(t);
   }, []);

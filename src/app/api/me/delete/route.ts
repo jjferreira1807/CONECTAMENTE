@@ -13,10 +13,12 @@ export const dynamic = "force-dynamic";
  *
  * Steps:
  *   1. Delete user-owned rows (RLS-safe via the user's session client).
- *   2. Delete the auth user via the service role (cascades to profile).
+ *   2. Delete the auth user via the service role.
  *
- * If service role is not configured, we still wipe data rows; the auth user
- * itself must then be deleted from the Supabase dashboard.
+ * No profile table to cascade — we don't keep one (privacy by design). The
+ * only row that names the user beyond their `user_id` is `auth.users`, which
+ * step 2 removes. If service role is not configured, data rows are still
+ * wiped and the auth user must be removed manually from the dashboard.
  */
 export async function POST(req: NextRequest) {
   const ctx = await requireUser(req, RATE_LIMITS.authBurst);

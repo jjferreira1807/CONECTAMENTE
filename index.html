@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CONECTAMENTE — Bem-estar Digital</title>
+<meta name="description" content="Plataforma terapêutica digital para adultos com uso excessivo da internet. 12 episódios baseados em TCC, exercícios interativos e acompanhamento de progresso.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#070b12;--bg2:#0f1520;--bg3:#161e2e;--bg4:#1a2235;
+  --s1:rgba(255,255,255,0.04);--s2:rgba(255,255,255,0.07);--s3:rgba(255,255,255,0.11);
+  --b1:rgba(255,255,255,0.07);--b2:rgba(255,255,255,0.13);--b3:rgba(255,255,255,0.22);
+  --t1:#eae6de;--t2:#8b97ab;--t3:#4e5a6b;
+  --g:#6fb49a;--g2:#92cdb5;--gbg:rgba(111,180,154,0.11);--gbr:rgba(111,180,154,0.28);
+  --gold:#b8935a;--goldbg:rgba(184,147,90,0.1);--goldbr:rgba(184,147,90,0.25);
+  --r:10px;--r2:15px;--r3:20px;
+  --serif:'DM Serif Display',serif;--sans:'DM Sans',system-ui,sans-serif;
+}
+html,body{height:100%;overflow:hidden;background:var(--bg)}
+body{font-family:var(--sans);font-size:14px;line-height:1.5;color:var(--t1)}
+#cs{position:fixed;inset:0;z-index:999;background:#060810;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden}
+#cs canvas{position:absolute;inset:0;pointer-events:none;width:100%;height:100%}
+#cs-ui{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;pointer-events:none}
+#cs-badge{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:rgba(111,180,154,.45);margin-bottom:28px;opacity:0;transition:opacity 1s}
+#cs-badge.vis{opacity:1}
+#cs-brain{width:min(320px,85vw);height:min(260px,69vw);margin-bottom:20px;overflow:visible}
+#cs-msg-wrap{height:20px;margin-bottom:13px;display:flex;align-items:center}
+#cs-msg{font-size:12px;color:rgba(180,200,220,.65);letter-spacing:.06em;opacity:0;transition:opacity .35s}
+#cs-msg.vis{opacity:1}
+#cs-bar-outer{width:min(260px,70vw);height:2.5px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden;margin-bottom:9px}
+#cs-bar{height:100%;width:0%;border-radius:2px;background:linear-gradient(90deg,#3d8a70,#6fb49a,#b8935a);transition:width .22s ease}
+#cs-pct{font-size:11px;color:rgba(111,180,154,.55);letter-spacing:.07em}
+#cs-flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
+#app{position:fixed;inset:0;display:none;flex-direction:column;background:var(--bg);overflow:hidden}
+#app.show{display:flex}
+nav{flex-shrink:0;display:flex;align-items:center;padding:0 22px;height:52px;background:rgba(7,11,18,.95);border-bottom:0.5px solid var(--b1);gap:4px;overflow-x:auto}
+nav::-webkit-scrollbar{display:none}
+.nav-logo{display:flex;align-items:center;gap:9px;margin-right:12px;text-decoration:none;flex-shrink:0}
+.logo-chip{width:28px;height:28px;background:var(--g);border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:13px;color:#060810;font-weight:700;flex-shrink:0}
+.logo-name{font-size:13px;font-weight:500;color:var(--t1);letter-spacing:.05em;white-space:nowrap}
+.nav-tab{padding:5px 12px;border-radius:var(--r);font-size:12px;color:var(--t2);cursor:pointer;border:none;background:transparent;font-family:var(--sans);transition:all .15s;white-space:nowrap;flex-shrink:0}
+.nav-tab:hover{color:var(--t1);background:var(--s1)}
+.nav-tab.on{color:var(--g);background:var(--gbg)}
+.nav-spacer{flex:1;min-width:8px}
+.streak-pill{display:flex;align-items:center;gap:5px;background:var(--goldbg);border:0.5px solid var(--goldbr);border-radius:20px;padding:4px 10px;font-size:11px;color:var(--gold);margin-right:8px;flex-shrink:0;white-space:nowrap}
+.avatar{width:28px;height:28px;border-radius:50%;background:var(--gbg);border:1px solid var(--gbr);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--g);font-weight:500;cursor:pointer;flex-shrink:0}
+.screen{display:none;flex:1;overflow-y:auto;padding:20px 22px;-webkit-overflow-scrolling:touch}
+.screen.on{display:block}
+.screen::-webkit-scrollbar{width:4px}
+.screen::-webkit-scrollbar-thumb{background:var(--b1);border-radius:2px}
+.dash-head{margin-bottom:18px}
+.dash-head h1{font-family:var(--serif);font-size:clamp(18px,4vw,24px);color:var(--t1);font-weight:400;margin-bottom:3px}
+.dash-head p{font-size:12px;color:var(--t2)}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:16px}
+.sc{background:var(--bg2);border:0.5px solid var(--b1);border-radius:var(--r2);padding:13px 15px}
+.sc-lbl{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px}
+.sc-val{font-family:var(--serif);font-size:22px;color:var(--t1)}
+.sc-sub{font-size:10px;margin-top:3px}
+.two-col{display:grid;grid-template-columns:1.35fr 1fr;gap:12px}
+@media(max-width:680px){.two-col{grid-template-columns:1fr}}
+.card{background:var(--bg2);border:0.5px solid var(--b1);border-radius:var(--r2);padding:15px 17px;margin-bottom:12px}
+.card:last-child{margin-bottom:0}
+.card-lbl{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+.ep-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--b1)}
+.ep-row:last-child{border-bottom:none}
+.ep-icon{width:34px;height:34px;border-radius:9px;background:var(--gbg);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.ep-info{flex:1;min-width:0}
+.ep-title{font-size:12px;font-weight:500;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ep-meta{font-size:10px;color:var(--t3);margin-top:2px}
+.bdg{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:20px;font-size:10px;white-space:nowrap;flex-shrink:0}
+.bdg-g{background:var(--gbg);color:var(--g);border:0.5px solid var(--gbr)}
+.bdg-a{background:var(--goldbg);color:var(--gold);border:0.5px solid var(--goldbr)}
+.bdg-n{background:var(--s1);color:var(--t3);border:0.5px solid var(--b1)}
+.pbar{height:3px;background:var(--s1);border-radius:2px;overflow:hidden;margin-top:5px}
+.pbar-fill{height:100%;background:var(--g);border-radius:2px}
+.mood-emojis{display:flex;gap:6px;margin-bottom:12px}
+.moji{flex:1;text-align:center;cursor:pointer}
+.moji-face{font-size:18px;padding:7px 2px;border-radius:var(--r);border:0.5px solid var(--b1);background:var(--s1);transition:all .15s;display:block}
+.moji:hover .moji-face,.moji.sel .moji-face{background:var(--gbg);border-color:var(--gbr)}
+.moji-lbl{font-size:9px;color:var(--t3);margin-top:3px}
+.moji.sel .moji-lbl{color:var(--g)}
+.bars-row{display:flex;align-items:flex-end;gap:5px;height:70px;margin-top:4px}
+.bar-w{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;height:100%}
+.bar-bg{flex:1;width:100%;background:var(--s1);border-radius:3px 3px 0 0;position:relative;overflow:hidden}
+.bar-fg{position:absolute;bottom:0;left:0;right:0;border-radius:3px 3px 0 0;transition:height .7s cubic-bezier(.34,1.56,.64,1)}
+.bar-lbl{font-size:9px;color:var(--t3)}
+.intent-text{font-size:12px;color:var(--t2);line-height:1.65;font-style:italic;padding:6px 0}
+.link-btn{font-size:11px;color:var(--g);cursor:pointer;display:inline-flex;align-items:center;gap:4px;margin-top:6px;background:none;border:none;font-family:var(--sans);padding:0;transition:color .15s}
+.link-btn:hover{color:var(--g2)}
+.page-head{margin-bottom:16px}
+.page-head-sub{font-size:11px;color:var(--t3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px}
+.page-head h2{font-family:var(--serif);font-size:clamp(18px,4vw,22px);color:var(--t1);font-weight:400}
+.ep-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:16px}
+.ep-header-left .page-head-sub{margin-bottom:4px}
+.ep-header-left h2{font-family:var(--serif);font-size:clamp(18px,4vw,22px);color:var(--t1);font-weight:400}
+.ep-count{font-size:12px;color:var(--t2)}
+.eps-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.epc{background:var(--bg2);border:0.5px solid var(--b1);border-radius:var(--r2);padding:14px;cursor:pointer;transition:all .2s;position:relative}
+.epc:hover:not(.locked){background:var(--bg3);border-color:var(--gbr)}
+.epc.done{border-color:rgba(111,180,154,.18)}
+.epc.locked{opacity:.45;cursor:default}
+.epc-num{font-size:10px;color:var(--t3);letter-spacing:.05em;text-transform:uppercase;margin-bottom:5px}
+.epc-title{font-size:13px;font-weight:500;color:var(--t1);line-height:1.3;margin-bottom:4px}
+.epc-desc{font-size:11px;color:var(--t2);line-height:1.5;margin-bottom:10px}
+.epc-foot{display:flex;align-items:center;justify-content:space-between}
+.epc-tag{font-size:10px;color:var(--g);background:var(--gbg);padding:2px 7px;border-radius:20px}
+.epc-dur{font-size:10px;color:var(--t3)}
+.epc-check{position:absolute;top:10px;right:10px;width:18px;height:18px;border-radius:50%;background:var(--g);display:flex;align-items:center;justify-content:center;font-size:9px;color:#060810;pointer-events:none}
+.epc-lock{position:absolute;top:10px;right:10px;font-size:12px;color:var(--t3);pointer-events:none}
+.ex-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:620px){.ex-grid{grid-template-columns:1fr}}
+.ex-card{background:var(--bg2);border:0.5px solid var(--b1);border-radius:var(--r2);padding:17px}
+.ex-lbl{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+.breath-ring-wrap{display:flex;flex-direction:column;align-items:center;padding:6px 0}
+.b-ring{width:110px;height:110px;border-radius:50%;border:1.5px solid var(--g);display:flex;align-items:center;justify-content:center;margin-bottom:12px;cursor:pointer;transition:border-color .3s;position:relative;user-select:none}
+.b-ring::after{content:'';position:absolute;inset:-9px;border-radius:50%;border:0.5px solid rgba(111,180,154,.12);pointer-events:none}
+.b-phase{font-size:10px;color:var(--g);letter-spacing:.08em;text-transform:uppercase}
+.b-count{font-family:var(--serif);font-size:30px;color:var(--t1);line-height:1}
+.b-cycles{font-size:11px;color:var(--t3);margin:8px 0 12px}
+.btns-row{display:flex;gap:8px;width:100%}
+.btn-p{flex:1;padding:8px;border-radius:var(--r);background:var(--g);color:#060810;border:none;font-size:12px;font-weight:500;cursor:pointer;font-family:var(--sans);transition:background .15s}
+.btn-p:hover{background:var(--g2)}
+.btn-g{flex:1;padding:8px;border-radius:var(--r);background:transparent;color:var(--t2);border:0.5px solid var(--b2);font-size:12px;cursor:pointer;font-family:var(--sans);transition:all .15s}
+.btn-g:hover{background:var(--s2);color:var(--t1)}
+.b-info{margin-top:13px;padding:10px;background:var(--bg3);border-radius:var(--r);border:0.5px solid var(--b1);font-size:11px;color:var(--t2);line-height:1.6}
+.b-info strong{color:var(--g)}
+.b-info .gold{color:var(--gold)}
+.ex-q{font-size:13px;font-weight:500;color:var(--t1);margin-bottom:6px;line-height:1.4}
+.ex-hint{font-size:11px;color:var(--t2);line-height:1.6;margin-bottom:10px}
+textarea{width:100%;background:var(--bg3);border:0.5px solid var(--b1);border-radius:var(--r);padding:10px 12px;color:var(--t1);font-family:var(--sans);font-size:12px;resize:none;min-height:78px;outline:none;transition:border-color .15s;-webkit-appearance:none}
+textarea:focus{border-color:var(--gbr)}
+textarea::placeholder{color:var(--t3)}
+.save-btn{width:100%;margin-top:9px;padding:8px;border-radius:var(--r);background:var(--gbg);color:var(--g);border:0.5px solid var(--gbr);font-size:12px;font-weight:500;cursor:pointer;font-family:var(--sans);transition:background .15s}
+.save-btn:hover{background:rgba(111,180,154,.2)}
+.chk-list{list-style:none;margin-top:4px}
+.chk-item{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:0.5px solid var(--b1);font-size:12px;color:var(--t2);cursor:pointer;transition:color .15s}
+.chk-item:last-child{border-bottom:none}
+.chk-item.done{color:var(--t3);text-decoration:line-through}
+.chk-box{width:16px;height:16px;border-radius:4px;border:0.5px solid var(--b2);background:var(--s1);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;transition:all .15s}
+.chk-box.done{background:var(--g);border-color:var(--g);color:#060810}
+.prog-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+@media(max-width:620px){.prog-grid{grid-template-columns:1fr}}
+.prog-card{background:var(--bg2);border:0.5px solid var(--b1);border-radius:var(--r2);padding:15px 17px}
+.prog-ring-wrap{display:flex;justify-content:center;margin:8px 0}
+.insight-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.insight{background:var(--bg2);border:0.5px solid var(--b1);border-radius:var(--r2);padding:13px;text-align:center}
+.insight-icon{font-size:20px;margin-bottom:5px}
+.insight-val{font-family:var(--serif);font-size:18px;color:var(--t1)}
+.insight-lbl{font-size:10px;color:var(--t3);margin-top:2px}
+#toast-area{position:fixed;bottom:22px;right:22px;display:flex;flex-direction:column;gap:6px;z-index:500;pointer-events:none}
+.toast{background:var(--bg3);border:0.5px solid var(--gbr);border-radius:20px;padding:8px 16px;font-size:12px;color:var(--t1);display:flex;align-items:center;gap:8px;opacity:0;transform:translateY(8px);transition:all .3s;white-space:nowrap;max-width:320px}
+.toast.vis{opacity:1;transform:translateY(0)}
+.toast-dot{width:6px;height:6px;border-radius:50%;background:var(--g);flex-shrink:0}
+#modal-overlay{position:fixed;inset:0;background:rgba(6,8,16,.85);z-index:300;display:none;align-items:center;justify-content:center;padding:20px}
+#modal-overlay.open{display:flex}
+#modal{background:var(--bg2);border:0.5px solid var(--b2);border-radius:var(--r3);padding:22px;max-width:480px;width:100%;max-height:85vh;overflow-y:auto}
+#modal::-webkit-scrollbar{width:3px}
+#modal::-webkit-scrollbar-thumb{background:var(--b1)}
+.modal-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+.modal-tag{font-size:10px;color:var(--g);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.modal-title{font-family:var(--serif);font-size:18px;color:var(--t1);font-weight:400}
+.modal-close{background:none;border:none;color:var(--t3);cursor:pointer;font-size:18px;line-height:1;padding:2px;transition:color .15s;font-family:var(--sans)}
+.modal-close:hover{color:var(--t1)}
+.modal-body p{font-size:12px;color:var(--t2);line-height:1.7;margin-bottom:10px}
+.modal-box{background:var(--gbg);border:0.5px solid var(--gbr);border-radius:var(--r2);padding:13px;margin:10px 0}
+.modal-box-lbl{font-size:10px;color:var(--g);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+.modal-q{font-size:12px;font-weight:500;color:var(--t1);margin-bottom:7px}
+.chk-modal{list-style:none;margin-top:8px}
+.chk-modal li{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--t2);padding:5px 0;cursor:pointer;border-bottom:0.5px solid rgba(111,180,154,.12)}
+.chk-modal li:last-child{border-bottom:none}
+.chk-modal li.done{color:var(--t3);text-decoration:line-through}
+.chk-modal .cb{width:15px;height:15px;border-radius:3px;border:0.5px solid var(--b2);background:var(--s1);display:flex;align-items:center;justify-content:center;font-size:8px;flex-shrink:0;transition:all .15s}
+.chk-modal .cb.done{background:var(--g);border-color:var(--g);color:#060810}
+.modal-actions{display:flex;gap:8px;margin-top:14px}
+.c-g{color:var(--g)}
+.c-gold{color:var(--gold)}
+</style>
+</head>
+<body>
+
+<div id="cs">
+  <canvas id="cs-stars"></canvas>
+  <div id="cs-ui">
+    <div id="cs-badge">CONECTAMENTE</div>
+    <svg id="cs-brain" viewBox="0 0 320 260" xmlns="http://www.w3.org/2000/svg" overflow="visible">
+      <defs>
+        <filter id="fg" x="-60%" y="-60%" width="220%" height="220%">
+          <feGaussianBlur stdDeviation="4" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="fgold" x="-70%" y="-70%" width="240%" height="240%">
+          <feGaussianBlur stdDeviation="7" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="fbrain" x="-35%" y="-35%" width="170%" height="170%">
+          <feGaussianBlur stdDeviation="12" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      <g id="bpaths" opacity="0">
+        <path d="M130,220 C90,220 55,200 42,172 C28,142 30,108 45,85 C58,64 78,52 98,48 C112,44 125,46 135,52" fill="none" stroke="rgba(111,180,154,0.32)" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M135,52 C148,40 163,36 175,38 C190,41 200,52 205,65" fill="none" stroke="rgba(111,180,154,0.32)" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M205,65 C215,50 230,44 245,46 C262,49 274,62 278,80" fill="none" stroke="rgba(111,180,154,0.32)" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M278,80 C285,98 284,120 276,140 C267,162 250,178 232,186" fill="none" stroke="rgba(111,180,154,0.32)" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M232,186 C218,193 202,196 188,194 C175,192 165,185 160,175" fill="none" stroke="rgba(111,180,154,0.32)" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M160,175 C155,182 148,188 140,192 C128,197 115,196 105,190 C92,183 84,170 80,155" fill="none" stroke="rgba(111,180,154,0.32)" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M80,155 C74,140 72,122 76,106 C80,92 90,80 100,73" fill="none" stroke="rgba(111,180,154,0.32)" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M100,73 C110,66 122,62 130,65 C140,69 145,80 142,92 C138,106 126,114 115,120 C105,126 95,130 90,140" fill="none" stroke="rgba(111,180,154,0.18)" stroke-width="1" stroke-linecap="round"/>
+        <path d="M200,72 C212,78 220,90 218,104 C215,120 202,130 192,138 C180,147 172,155 174,168" fill="none" stroke="rgba(111,180,154,0.18)" stroke-width="1" stroke-linecap="round"/>
+        <path d="M145,95 C152,88 162,86 170,90 C180,95 183,108 178,120 C174,130 165,136 157,140" fill="none" stroke="rgba(111,180,154,0.18)" stroke-width="1" stroke-linecap="round"/>
+        <path d="M130,160 C140,168 152,172 162,170 C172,168 180,160 182,150" fill="none" stroke="rgba(111,180,154,0.15)" stroke-width="1" stroke-linecap="round"/>
+        <path d="M148,210 C148,218 150,226 152,234 M152,234 C155,242 158,246 160,248 M168,210 C168,218 166,226 164,234 M164,234 C161,242 158,246 160,248" fill="none" stroke="rgba(111,180,154,0.22)" stroke-width="1.2" stroke-linecap="round"/>
+      </g>
+      <g id="bsynapses" opacity="0" stroke="rgba(111,180,154,0.1)" stroke-width=".7">
+        <line x1="98" y1="75" x2="140" y2="95"/>
+        <line x1="140" y1="95" x2="170" y2="88"/>
+        <line x1="170" y1="88" x2="215" y2="80"/>
+        <line x1="98" y1="75" x2="90" y2="130"/>
+        <line x1="90" y1="130" x2="110" y2="165"/>
+        <line x1="110" y1="165" x2="155" y2="175"/>
+        <line x1="155" y1="175" x2="195" y2="168"/>
+        <line x1="195" y1="168" x2="235" y2="145"/>
+        <line x1="215" y1="80" x2="255" y2="100"/>
+        <line x1="255" y1="100" x2="235" y2="145"/>
+        <line x1="140" y1="95" x2="110" y2="165"/>
+        <line x1="160" y1="55" x2="140" y2="95"/>
+        <line x1="160" y1="55" x2="170" y2="88"/>
+      </g>
+      <g id="bneurons">
+        <g class="bn" transform="translate(98,75)"><circle r="7" fill="rgba(111,180,154,0)" stroke="rgba(111,180,154,0.25)" stroke-width="1"/><circle r="3" fill="rgba(111,180,154,0)"/></g>
+        <g class="bn" transform="translate(140,95)"><circle r="7" fill="rgba(111,180,154,0)" stroke="rgba(111,180,154,0.25)" stroke-width="1"/><circle r="3" fill="rgba(111,180,154,0)"/></g>
+        <g class="bn" transform="translate(170,88)"><circle r="7" fill="rgba(111,180,154,0)" stroke="rgba(111,180,154,0.25)" stroke-width="1"/><circle r="3" fill="rgba(111,180,154,0)"/></g>
+        <g class="bn" transform="translate(215,80)"><circle r="7" fill="rgba(111,180,154,0)" stroke="rgba(111,180,154,0.25)" stroke-width="1"/><circle r="3" fill="rgba(111,180,154,0)"/></g>
+        <g class="bn" transform="translate(255,100)"><circle r="7" fill="rgba(111,180,154,0)" stroke="rgba(111,180,154,0.25)" stroke-width="1"/><circle r="3" fill="rgba(111,180,154,0)"/></g>
+        <g class="bn" transform="translate(235,145)"><circle r="7" fill="rgba(111,180,154,0)" stroke="rgba(111,180,154,0.25)" stroke-width="1"/><circle r="3" fill="rgba(111,180,154,0)"/></g>
+        <g class="bn" transform="translate(195,168)"><circle r="7" fill="rgba(111,180,154,0)" stroke="rgba(111,180,154,0.25)" stroke-width="1"/><circle r="3" fill="rgba(111,180,154,0)"/></g>
+        <g class="bn" transform="translate(155,175)"><circle r="7" fill="rgba(111,180,154,0)" stroke="rgba(111,180,154,0.25)" stroke-width="1"/><circle r="3" fill="rgba(111,180,154,0)"/></g>
+        <g class="bn" transform="translate(110,165)"><circle r="7" fill="rgba(111,180,154,0)" stroke="rgba(111,180,154,0.25)" stroke-width="1"/><circle r="3" fill="rgba(111,180,154,0)"/></g>
+        <g class="bn" transform="translate(90,130)"><circle r="7" fill="rgba(111,180,154,0)" stroke="rgba(111,180,154,0.25)" stroke-width="1"/><circle r="3" fill="rgba(111,180,154,0)"/></g>
+        <g class="bn" transform="translate(65,100)"><circle r="7" fill="rgba(111,180,154,0)" stroke="rgba(111,180,154,0.25)" stroke-width="1"/><circle r="3" fill="rgba(111,180,154,0)"/></g>
+        <g class="bn" transform="translate(160,55)"><circle r="7" fill="rgba(111,180,154,0)" stroke="rgba(111,180,154,0.25)" stroke-width="1"/><circle r="3" fill="rgba(111,180,154,0)"/></g>
+      </g>
+      <ellipse id="bglow" cx="165" cy="130" rx="108" ry="92" fill="rgba(184,147,90,0)" filter="url(#fbrain)"/>
+    </svg>
+    <div id="cs-msg-wrap"><div id="cs-msg"></div></div>
+    <div id="cs-bar-outer"><div id="cs-bar"></div></div>
+    <div id="cs-pct">0%</div>
+  </div>
+  <div id="cs-flash"></div>
+</div>
+
+<div id="app">
+  <nav>
+    <a class="nav-logo" href="#" onclick="return false">
+      <div class="logo-chip">C</div>
+      <span class="logo-name">CONECTAMENTE</span>
+    </a>
+    <button class="nav-tab on" onclick="goNav(this,'dashboard')">Dashboard</button>
+    <button class="nav-tab" onclick="goNav(this,'episodes')">Episódios</button>
+    <button class="nav-tab" onclick="goNav(this,'exercises')">Exercícios</button>
+    <button class="nav-tab" onclick="goNav(this,'progress')">Progresso</button>
+    <div class="nav-spacer"></div>
+    <div class="streak-pill">🔥 7 dias</div>
+    <div class="avatar" title="Ana Sofia">AS</div>
+  </nav>
+
+  <div class="screen on" id="s-dashboard">
+    <div class="dash-head">
+      <h1>Bom dia, <em>Ana Sofia</em></h1>
+      <p>Continua a tua jornada — estás a 65% do programa. A sequência de hoje está em curso.</p>
+    </div>
+    <div class="stats-grid">
+      <div class="sc"><div class="sc-lbl">Progresso</div><div class="sc-val">65%</div><div class="sc-sub c-g">Ep. 8 de 12</div></div>
+      <div class="sc"><div class="sc-lbl">Sequência</div><div class="sc-val">7</div><div class="sc-sub c-gold">dias seguidos 🔥</div></div>
+      <div class="sc"><div class="sc-lbl">XP total</div><div class="sc-val">850</div><div class="sc-sub c-g">+100 hoje</div></div>
+      <div class="sc"><div class="sc-lbl">Horas online</div><div class="sc-val">2.4h</div><div class="sc-sub c-g">↓ 38% esta semana</div></div>
+    </div>
+    <div class="two-col">
+      <div>
+        <div class="card">
+          <div class="card-lbl">Episódios recentes</div>
+          <div class="ep-row">
+            <div class="ep-icon">🧠</div>
+            <div class="ep-info"><div class="ep-title">Crenças e pensamentos digitais</div><div class="ep-meta">Ep. 2 · Cognição · 32 min</div></div>
+            <span class="bdg bdg-g">✓ Concluído</span>
+          </div>
+          <div class="ep-row">
+            <div class="ep-icon">🔄</div>
+            <div class="ep-info"><div class="ep-title">Comportamentos e controlo</div><div class="ep-meta">Ep. 3 · Comportamento · 28 min</div><div class="pbar"><div class="pbar-fill" style="width:60%"></div></div></div>
+            <span class="bdg bdg-a">Em curso</span>
+          </div>
+          <div class="ep-row">
+            <div class="ep-icon" style="background:var(--s1);opacity:.5">🌙</div>
+            <div class="ep-info" style="opacity:.45"><div class="ep-title">A importância do sono</div><div class="ep-meta">Ep. 4 · Saúde · 30 min</div></div>
+            <span class="bdg bdg-n">🔒 Bloqueado</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <div class="card-lbl">Como te sentes hoje?</div>
+          <div class="mood-emojis" id="moods">
+            <div class="moji" onclick="pickMood(this,'Difícil')"><span class="moji-face">😞</span><div class="moji-lbl">Difícil</div></div>
+            <div class="moji" onclick="pickMood(this,'Neutro')"><span class="moji-face">😐</span><div class="moji-lbl">Neutro</div></div>
+            <div class="moji sel" onclick="pickMood(this,'Bem')"><span class="moji-face">🙂</span><div class="moji-lbl">Bem</div></div>
+            <div class="moji" onclick="pickMood(this,'Ótimo')"><span class="moji-face">😊</span><div class="moji-lbl">Ótimo</div></div>
+            <div class="moji" onclick="pickMood(this,'Excelente')"><span class="moji-face">✨</span><div class="moji-lbl">Excelente</div></div>
+          </div>
+          <div class="bars-row" id="dbars"></div>
+        </div>
+        <div class="card">
+          <div class="card-lbl">Intenção de hoje</div>
+          <div class="intent-text">"30 minutos offline antes de dormir — ler em vez de verificar o telemóvel."</div>
+          <button class="link-btn" onclick="showToast('Intenção marcada! +5 XP ✦')">✓ Marcar como cumprida</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen" id="s-episodes">
+    <div class="ep-header">
+      <div class="ep-header-left">
+        <div class="page-head-sub">Jornada de 12 episódios</div>
+        <h2>Os teus episódios</h2>
+      </div>
+      <div class="ep-count">8 de 12 desbloqueados</div>
+    </div>
+    <div class="eps-grid" id="epsgrid"></div>
+  </div>
+
+  <div class="screen" id="s-exercises">
+    <div class="page-head">
+      <div class="page-head-sub">Técnicas TCC</div>
+      <h2>Exercícios interativos</h2>
+    </div>
+    <div class="ex-grid">
+      <div class="ex-card">
+        <div class="ex-lbl">Respiração 4-7-8</div>
+        <div class="breath-ring-wrap">
+          <div class="b-ring" id="bring" onclick="toggleBreath()">
+            <div style="text-align:center">
+              <div class="b-phase" id="bphase">Pronto?</div>
+              <div class="b-count" id="bcount">4</div>
+            </div>
+          </div>
+          <div class="b-cycles" id="bcycles">Ciclo 0 de 4</div>
+          <div class="btns-row">
+            <button class="btn-p" id="bbtn" onclick="toggleBreath()">▶ Iniciar</button>
+            <button class="btn-g" onclick="resetBreath()">↺ Reiniciar</button>
+          </div>
+        </div>
+        <div class="b-info">Inspira <strong>4s</strong> → Segura <span class="gold">7s</span> → Expira <strong>8s</strong>. Ativa o sistema nervoso parassimpático e reduz o impulso de verificar o telemóvel.</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="ex-card">
+          <div class="ex-lbl">Registo de pensamentos</div>
+          <div class="ex-q">Que pensamento tiveste antes de verificar o telemóvel?</div>
+          <div class="ex-hint">Escreve o pensamento automático exatamente como surgiu, sem julgamento.</div>
+          <textarea id="reftxt" placeholder="Ex: 'Tenho que ver se alguém me enviou mensagem...'"></textarea>
+          <button class="save-btn" onclick="saveRef()">✦ Guardar reflexão</button>
+        </div>
+        <div class="ex-card">
+          <div class="ex-lbl">Checklist — Episódio 3</div>
+          <ul class="chk-list" id="chklist">
+            <li class="chk-item done" onclick="toggleChk(this)"><div class="chk-box done">✓</div>Ouvi o episódio completo</li>
+            <li class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div>Identifiquei os meus gatilhos</li>
+            <li class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div>Fiz o exercício de respiração</li>
+            <li class="chk-item" onclick="toggleChk(this)"><div class="chk-box"></div>Escrevi a minha reflexão</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen" id="s-progress">
+    <div class="page-head">
+      <div class="page-head-sub">As tuas estatísticas</div>
+      <h2>O teu progresso</h2>
+    </div>
+    <div class="prog-grid">
+      <div class="prog-card">
+        <div class="card-lbl">Progresso geral</div>
+        <div class="prog-ring-wrap">
+          <svg width="120" height="120" viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="8"/>
+            <circle cx="60" cy="60" r="50" fill="none" stroke="#6fb49a" stroke-width="8" stroke-linecap="round" stroke-dasharray="314" stroke-dashoffset="110" transform="rotate(-90 60 60)"/>
+            <text x="60" y="56" text-anchor="middle" font-family="DM Serif Display,serif" font-size="20" fill="#eae6de">65%</text>
+            <text x="60" y="72" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#4e5a6b">completo</text>
+          </svg>
+        </div>
+        <div style="font-size:11px;color:var(--t2);text-align:center">8 de 12 episódios concluídos</div>
+      </div>
+      <div class="prog-card">
+        <div class="card-lbl">Horas online — 7 dias</div>
+        <div class="bars-row" id="pbars" style="height:90px;margin-top:8px"></div>
+      </div>
+    </div>
+    <div class="insight-grid">
+      <div class="insight"><div class="insight-icon">📉</div><div class="insight-val">3.8h</div><div class="insight-lbl">Média semanal</div><div style="font-size:10px;color:var(--g);margin-top:2px">↓ 22%</div></div>
+      <div class="insight"><div class="insight-icon">🌙</div><div class="insight-val">0.4h</div><div class="insight-lbl">Uso noturno</div><div style="font-size:10px;color:var(--g);margin-top:2px">↓ 67%</div></div>
+      <div class="insight"><div class="insight-icon">🔥</div><div class="insight-val">7</div><div class="insight-lbl">Melhor sequência</div><div style="font-size:10px;color:var(--gold);margin-top:2px">recorde pessoal</div></div>
+      <div class="insight"><div class="insight-icon">✍️</div><div class="insight-val">12</div><div class="insight-lbl">Reflexões escritas</div><div style="font-size:10px;color:var(--g);margin-top:2px">+3 esta semana</div></div>
+    </div>
+  </div>
+</div>
+
+<div id="modal-overlay" onclick="closeModal(event)">
+  <div id="modal">
+    <div class="modal-head">
+      <div><div class="modal-tag" id="m-tag"></div><div class="modal-title" id="m-title"></div></div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="m-body"></div>
+  </div>
+</div>
+
+<div id="toast-area">
+  <div class="toast" id="t1"><div class="toast-dot"></div><span id="tmsg"></span></div>
+</div>
+
+<script>
+const DAYS=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+const todayIdx=new Date().getDay();
+const moodData=[3,4,2,4,5,3,4];
+const moodColors=['#6fb49a','#b8935a','#6fb49a','#6fb49a','#6fb49a','#b8935a','#6fb49a'];
+const screenData=[6.2,4.8,5.5,3.2,2.9,4.1,2.4];
+const screenColors=['#b8935a','#b8935a','#b8935a','#6fb49a','#6fb49a','#b8935a','#6fb49a'];
+const EPS=[
+  {n:1,title:'Bem-vindo à tua jornada',desc:'Introdução à plataforma e primeiro exercício de consciencialização digital.',tag:'Introdução',dur:'25 min',status:'done'},
+  {n:2,title:'Crenças e pensamentos digitais',desc:'Crenças disfuncionais e pensamentos automáticos por detrás do uso excessivo.',tag:'Cognição',dur:'32 min',status:'done'},
+  {n:3,title:'Comportamentos e controlo',desc:'Identificar gatilhos e técnicas práticas de controlo comportamental.',tag:'Comportamento',dur:'28 min',status:'progress',pct:60},
+  {n:4,title:'A importância do sono',desc:'Higiene do sono, luz azul e impacto nos ritmos circadianos.',tag:'Saúde',dur:'30 min',status:'free'},
+  {n:5,title:'TCC — conversa de especialistas',desc:'Psicoeducação aprofundada sobre Terapia Cognitivo-Comportamental.',tag:'TCC',dur:'35 min',status:'free'},
+  {n:6,title:'O cérebro e os estímulos digitais',desc:'Neurobiologia da dependência: dopamina, recompensa e circuitos neurais.',tag:'Neurociência',dur:'28 min',status:'locked'},
+  {n:7,title:'Técnicas práticas de recuperação',desc:'Controlo de estímulos, planificação e atividades alternativas offline.',tag:'Prática',dur:'32 min',status:'locked'},
+  {n:8,title:'Isolamento e conexão humana',desc:'Reconstruir laços reais e sair do ciclo de solidão digital.',tag:'Relações',dur:'30 min',status:'locked'},
+  {n:9,title:'Ansiedade — meditação guiada',desc:'Mindfulness adaptado para adultos com ansiedade digital.',tag:'Mindfulness',dur:'25 min',status:'locked'},
+  {n:10,title:'Depressão — apoio e psicoeducação',desc:'Ligação entre uso excessivo, isolamento e sintomas depressivos.',tag:'Saúde mental',dur:'33 min',status:'locked'},
+  {n:11,title:'Intenções para o futuro',desc:'Consolidar aprendizagens e criar o teu plano de bem-estar digital.',tag:'Conclusão',dur:'28 min',status:'locked'},
+  {n:12,title:'Trabalho para casa — o teu plano',desc:'Fichas, exercícios finais e plano pessoal de bem-estar digital.',tag:'Trabalho de casa',dur:'Livre',status:'locked'},
+];
+const EP_CONTENT={
+  1:{q:'Em que momentos do dia sentes mais impulso de verificar o telemóvel?',hint:'Pensa nos últimos 3 dias.',checks:['Instalei a aplicação CONECTAMENTE','Defini o meu objetivo principal','Registei o meu humor inicial','Escrevi a minha primeira intenção']},
+  2:{q:'Identifica uma crença disfuncional que tens sobre a internet.',hint:'Ex: "Só me sinto confortável a interagir online."',checks:['Ouvi o episódio completo','Identifiquei 3 crenças disfuncionais','Questionei a validade de pelo menos uma','Fiz o exercício de reestruturação cognitiva']},
+  3:{q:'Que pensamentos automáticos tiveste antes de verificar o telemóvel hoje?',hint:'Escreve exatamente como surgiu, sem julgamento.',checks:['Ouvi o episódio','Mapeei os meus gatilhos','Fiz o exercício de respiração','Escrevi a minha reflexão']},
+  4:{q:'Que dispositivos usas no quarto antes de dormir?',hint:'Pensa nos últimos 7 dias.',checks:['Ouvi o episódio sobre sono','Identifiquei os meus padrões noturnos','Defini uma hora de "desligar"','Removi o telemóvel do quarto por 1 noite']},
+  5:{q:'O que aprendeste sobre TCC que mais se aplica à tua situação?',hint:'Não há respostas erradas.',checks:['Ouvi a conversa de especialistas','Identifiquei um padrão cognitivo meu','Fiz o registo de pensamentos','Partilhei com alguém de confiança']},
+};
+function buildBars(id,data,colors,maxV){
+  const c=document.getElementById(id);if(!c)return;
+  c.innerHTML='';
+  const mx=maxV||Math.max(...data);
+  data.forEach((v,i)=>{
+    const idx=(todayIdx-data.length+1+i+7)%7;
+    const pct=(v/mx)*100;
+    const w=document.createElement('div');w.className='bar-w';
+    w.innerHTML=`<div class="bar-bg"><div class="bar-fg" style="height:0%;background:${colors[i]}" data-h="${pct}"></div></div><div class="bar-lbl">${DAYS[idx]}</div>`;
+    c.appendChild(w);
+  });
+  setTimeout(()=>c.querySelectorAll('.bar-fg').forEach(b=>b.style.height=b.dataset.h+'%'),100);
+}
+buildBars('dbars',moodData,moodColors,5);
+function buildEps(){
+  const g=document.getElementById('epsgrid');if(!g)return;
+  g.innerHTML='';
+  EPS.forEach(ep=>{
+    const locked=ep.status==='locked',done=ep.status==='done',prog=ep.status==='progress';
+    const d=document.createElement('div');
+    d.className='epc'+(locked?' locked':done?' done':'');
+    if(!locked)d.onclick=()=>openEpModal(ep);
+    d.innerHTML=`${done?'<div class="epc-check">✓</div>':''}${locked?'<div class="epc-lock">🔒</div>':''}<div class="epc-num">Episódio ${String(ep.n).padStart(2,'0')}${prog?' · Em progresso':done?' · Concluído':''}</div><div class="epc-title">${ep.title}</div><div class="epc-desc">${ep.desc}</div>${prog?`<div class="pbar" style="margin-bottom:9px"><div class="pbar-fill" style="width:${ep.pct}%"></div></div>`:''}<div class="epc-foot"><span class="epc-tag">${ep.tag}</span><span class="epc-dur">${ep.dur}</span></div>`;
+    g.appendChild(d);
+  });
+}
+buildEps();
+function goNav(btn,id){
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById('s-'+id).classList.add('on');
+  if(id==='progress')setTimeout(()=>buildBars('pbars',screenData,screenColors),60);
+}
+function pickMood(el,label){
+  document.querySelectorAll('.moji').forEach(m=>m.classList.remove('sel'));
+  el.classList.add('sel');showToast('Humor registado: '+label+' — +5 XP');
+}
+let bRun=false,bIv=null,bCycle=0,bPh=0,bCnt=4;
+const PHASES=[{name:'Inspira',dur:4},{name:'Segura',dur:7},{name:'Expira',dur:8}];
+const PHCOL=['var(--g)','var(--gold)','var(--g)'];
+function toggleBreath(){
+  if(bRun){clearInterval(bIv);bRun=false;document.getElementById('bbtn').textContent='▶ Continuar';}
+  else{bRun=true;document.getElementById('bbtn').textContent='⏸ Pausar';if(bCycle===0&&bPh===0)startPhase();else runB();}
+}
+function startPhase(){bPh=0;bCnt=PHASES[0].dur;updB();runB();}
+function runB(){
+  bIv=setInterval(()=>{
+    bCnt--;document.getElementById('bcount').textContent=bCnt;
+    if(bCnt<=0){
+      clearInterval(bIv);bPh=(bPh+1)%3;
+      if(bPh===0){bCycle++;document.getElementById('bcycles').textContent='Ciclo '+bCycle+' de 4';
+        if(bCycle>=4){bRun=false;document.getElementById('bphase').textContent='Concluído!';document.getElementById('bcount').textContent='';document.getElementById('bbtn').textContent='▶ Iniciar';showToast('Respiração concluída! Bem feito! 🌿');return;}
+      }
+      bCnt=PHASES[bPh].dur;updB();if(bRun)runB();
+    }
+  },1000);
+}
+function updB(){document.getElementById('bphase').textContent=PHASES[bPh].name;document.getElementById('bcount').textContent=bCnt;document.getElementById('bring').style.borderColor=PHCOL[bPh];}
+function resetBreath(){clearInterval(bIv);bRun=false;bCycle=0;bPh=0;bCnt=4;document.getElementById('bphase').textContent='Pronto?';document.getElementById('bcount').textContent='4';document.getElementById('bcycles').textContent='Ciclo 0 de 4';document.getElementById('bbtn').textContent='▶ Iniciar';document.getElementById('bring').style.borderColor='var(--g)';}
+function saveRef(){const t=document.getElementById('reftxt');if(t&&t.value.trim()){showToast('Reflexão guardada! +15 XP ✦');t.value='';}else showToast('Escreve algo primeiro...');}
+function toggleChk(el){el.classList.toggle('done');const b=el.querySelector('.chk-box');b.classList.toggle('done');b.textContent=el.classList.contains('done')?'✓':'';if(el.classList.contains('done'))showToast('Item concluído! +5 XP');}
+function openEpModal(ep){
+  const c=EP_CONTENT[ep.n];
+  document.getElementById('m-tag').textContent=ep.tag+' · '+ep.dur;
+  document.getElementById('m-title').textContent=ep.title;
+  const body=document.getElementById('m-body');
+  const isDone=ep.status==='done';
+  body.innerHTML=`<p>${ep.desc} Cada episódio inclui psicoeducação baseada em TCC, exercícios interativos e reflexões guiadas.</p>`;
+  if(c){const checks=c.checks.map((x,i)=>{const d=isDone||i===0;return `<li class="${d?'done':''}" onclick="toggleModalChk(this)"><div class="cb ${d?'done':''}">${d?'✓':''}</div>${x}</li>`;}).join('');body.innerHTML+=`<div class="modal-box"><div class="modal-box-lbl">${isDone?'✓ Episódio concluído':'▶ Exercício deste episódio'}</div><div class="modal-q">${c.q}</div><textarea placeholder="${c.hint}" style="min-height:65px;margin-bottom:10px"></textarea><ul class="chk-modal">${checks}</ul></div>`;}
+  body.innerHTML+=`<div class="modal-actions"><button class="btn-p" style="flex:1" onclick="closeModal();showToast('Progresso guardado! +20 XP ✦')">✦ Guardar progresso</button><button class="btn-g" onclick="closeModal()">Fechar</button></div>`;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function toggleModalChk(el){el.classList.toggle('done');const b=el.querySelector('.cb');b.classList.toggle('done');b.textContent=el.classList.contains('done')?'✓':'';}
+function closeModal(e){if(!e||e.target===document.getElementById('modal-overlay'))document.getElementById('modal-overlay').classList.remove('open');}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.getElementById('modal-overlay').classList.remove('open');});
+let tTimer=null;
+function showToast(msg){const el=document.getElementById('t1');document.getElementById('tmsg').textContent=msg;el.classList.add('vis');clearTimeout(tTimer);tTimer=setTimeout(()=>el.classList.remove('vis'),3200);}
+(function(){
+  const cv=document.getElementById('cs-stars');
+  cv.width=window.innerWidth;cv.height=window.innerHeight;
+  const ctx=cv.getContext('2d');
+  const stars=Array.from({length:260},()=>({x:Math.random()*cv.width,y:Math.random()*cv.height,r:Math.random()*1.5+0.3,a:Math.random(),sp:Math.random()*.007+.002,ph:Math.random()*Math.PI*2}));
+  let t0=null,rafId;
+  function drawStars(ts){if(!t0)t0=ts;const t=(ts-t0)/1000;ctx.clearRect(0,0,cv.width,cv.height);stars.forEach(s=>{const a=0.2+0.8*((Math.sin(s.ph+t*s.sp*6)+1)/2);ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=`rgba(210,225,255,${a*s.a})`;ctx.fill();});rafId=requestAnimationFrame(drawStars);}
+  rafId=requestAnimationFrame(drawStars);
+  const bpaths=document.querySelectorAll('#bpaths path');
+  const bsynapses=document.getElementById('bsynapses');
+  const neurons=document.querySelectorAll('.bn');
+  const bglow=document.getElementById('bglow');
+  const bar=document.getElementById('cs-bar');
+  const pctEl=document.getElementById('cs-pct');
+  const msgEl=document.getElementById('cs-msg');
+  const flash=document.getElementById('cs-flash');
+  const badge=document.getElementById('cs-badge');
+  const MSGS=['A inicializar o sistema neural…','A mapear circuitos cognitivos…','A ativar circuitos neurais…','A sincronizar neurónios…','A carregar psicoeducação…','A carregar episódios…','A preparar exercícios TCC…','A calibrar o bem-estar digital…','Sistema pronto.'];
+  function setMsg(txt){msgEl.classList.remove('vis');setTimeout(()=>{msgEl.textContent=txt;msgEl.classList.add('vis');},200);}
+  function setP(p){bar.style.width=p+'%';pctEl.textContent=Math.round(p)+'%';}
+  function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+  function initPaths(){bpaths.forEach(p=>{try{const l=p.getTotalLength();p.style.strokeDasharray=l;p.style.strokeDashoffset=l;}catch(e){p.style.strokeDasharray='300';p.style.strokeDashoffset='300';}});}
+  function drawPath(p,dur){return new Promise(r=>{p.style.transition=`stroke-dashoffset ${dur}ms linear`;p.style.strokeDashoffset='0';setTimeout(r,dur);});}
+  function lightNeuron(n,gold){const o=n.querySelector('circle:first-child'),i=n.querySelector('circle:last-child');if(gold){o.setAttribute('fill','rgba(184,147,90,0.15)');o.setAttribute('stroke','rgba(184,147,90,0.9)');o.setAttribute('stroke-width','1.5');o.setAttribute('filter','url(#fgold)');i.setAttribute('fill','rgba(184,147,90,1)');i.setAttribute('filter','url(#fgold)');}else{o.setAttribute('fill','rgba(111,180,154,0.14)');o.setAttribute('stroke','rgba(111,180,154,0.9)');o.setAttribute('stroke-width','1.5');o.setAttribute('filter','url(#fg)');i.setAttribute('fill','rgba(111,180,154,1)');i.setAttribute('filter','url(#fg)');}}
+  async function run(){
+    await sleep(350);badge.classList.add('vis');setMsg(MSGS[0]);msgEl.classList.add('vis');await sleep(700);
+    document.getElementById('bpaths').style.opacity='1';initPaths();
+    const durs=[850,650,650,750,650,700,750,550,550,550,480,480];
+    let elapsed=0,total=durs.reduce((a,b)=>a+b,0);
+    for(let i=0;i<bpaths.length;i++){await drawPath(bpaths[i],durs[i]);elapsed+=durs[i];setP(5+Math.round(elapsed/total*30));if(i===2)setMsg(MSGS[1]);if(i===6)setMsg(MSGS[2]);}
+    bsynapses.style.transition='opacity 0.8s';bsynapses.style.opacity='1';await sleep(850);
+    setMsg(MSGS[3]);setP(40);
+    for(let i=0;i<neurons.length;i++){lightNeuron(neurons[i],false);setP(40+Math.round(((i+1)/neurons.length)*30));if(i===3)setMsg(MSGS[4]);if(i===7)setMsg(MSGS[5]);await sleep(175);}
+    setP(72);setMsg(MSGS[6]);await sleep(650);setP(83);setMsg(MSGS[7]);await sleep(650);setP(100);setMsg(MSGS[8]);await sleep(280);
+    for(let i=0;i<neurons.length;i++){lightNeuron(neurons[i],true);await sleep(55);}
+    bglow.style.transition='fill 1s ease';bglow.setAttribute('fill','rgba(184,147,90,0.07)');await sleep(1100);bglow.setAttribute('fill','rgba(184,147,90,0.16)');await sleep(600);
+    flash.style.transition='opacity 0.16s ease-in';flash.style.opacity='1';await sleep(160);
+    cancelAnimationFrame(rafId);document.getElementById('cs').style.display='none';document.getElementById('app').classList.add('show');flash.style.opacity='0';
+    await sleep(200);showToast('Bem-vinda de volta, Ana Sofia! ✦');
+  }
+  run();
+})();
+</script>
+</body>
+</html>

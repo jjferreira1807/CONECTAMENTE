@@ -26,7 +26,7 @@ export function Testimonial() {
             é uma vitória que não cabe num story.
           </blockquote>
           <figcaption className="mt-8 text-sm text-muted">
-            Voz composta de testemunhos típicos · programas digitais de TCC, ensaios clínicos 2014–2022.
+            Voz composta de testemunhos típicos · programas digitais de bem-estar, 2014–2022.
           </figcaption>
         </motion.figure>
       </Container>

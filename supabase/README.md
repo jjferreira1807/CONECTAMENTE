@@ -13,7 +13,7 @@ supabase db push
 | File                                    | Purpose                                           |
 |-----------------------------------------|---------------------------------------------------|
 | `20260510000100_init.sql`               | Extensions, enums, helper functions, triggers     |
-| `20260510000200_profiles.sql`           | Profiles table + auto-create trigger              |
+| `20260510000200_profiles.sql`           | ~~Profiles table + auto-create trigger~~ — dropped by `20260511000100` |
 | `20260510000300_content.sql`            | Episodes & sections (public-read)                 |
 | `20260510000400_progress.sql`           | User progress, reflections, exercise answers      |
 | `20260510000500_emotional.sql`          | Mood, intentions, episode mood                    |
@@ -21,6 +21,12 @@ supabase db push
 | `20260510000700_analytics.sql`          | Events table + weekly view                        |
 | `20260510000800_storage.sql`            | Buckets + storage policies                        |
 | `20260510000900_seed.sql`               | Seeds 12 episodes                                 |
+| `20260511000100_drop_profiles.sql`      | **Privacy by design.** Removes `profiles` and the trigger that replicated Google's name/avatar. The app identifies users solely by `auth.uid()`. |
+
+> **Note on `20260510000200_profiles.sql`:** This file is kept in the repo
+> for historical traceability, but `20260511000100_drop_profiles.sql`
+> reverses everything it created. Fresh database deployments can still run
+> all migrations in order — the drop migration is idempotent.
 
 ## Verifying RLS
 

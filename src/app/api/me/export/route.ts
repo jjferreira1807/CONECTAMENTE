@@ -14,9 +14,11 @@ export async function GET(req: NextRequest) {
   const ctx = await requireUser(req, RATE_LIMITS.authBurst);
   if (ctx instanceof NextResponse) return ctx;
 
-  const [profile, progress, reflections, exercises, mood, intentions, downloads, notifications] =
+  // No `profiles` query: we don't keep a profile table. The export contains
+  // only progress-shaped data the user explicitly generated. `email` comes
+  // from `auth.users` (Supabase-managed) and is included once at the top.
+  const [progress, reflections, exercises, mood, intentions, downloads, notifications] =
     await Promise.all([
-      ctx.supabase.from("profiles").select("*").eq("id", ctx.user.id).maybeSingle(),
       ctx.supabase.from("user_progress").select("*"),
       ctx.supabase.from("reflections").select("*"),
       ctx.supabase.from("exercise_answers").select("*"),
@@ -26,7 +28,7 @@ export async function GET(req: NextRequest) {
       ctx.supabase.from("notifications").select("*"),
     ]);
 
-  const errors = [profile, progress, reflections, exercises, mood, intentions, downloads, notifications]
+  const errors = [progress, reflections, exercises, mood, intentions, downloads, notifications]
     .map((r) => r.error)
     .filter(Boolean);
   if (errors.length) return errServer(errors[0]!.message);
@@ -35,7 +37,6 @@ export async function GET(req: NextRequest) {
     schema: "conectamente.export.v1",
     exportedAt: new Date().toISOString(),
     user: { id: ctx.user.id, email: ctx.user.email },
-    profile: profile.data,
     user_progress: progress.data,
     reflections: reflections.data,
     exercise_answers: exercises.data,

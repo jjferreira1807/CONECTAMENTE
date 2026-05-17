@@ -15,7 +15,7 @@ export default function ProgramaPage() {
       <header className="relative overflow-hidden">
         <div
           aria-hidden
-          className="absolute -top-32 left-1/2 -translate-x-1/2 w-[900px] h-[900px] rounded-full pointer-events-none"
+          className="absolute -top-32 left-1/2 -translate-x-1/2 w-[900px] h-[900px] rounded-full pointer-events-none dark:hidden"
           style={{
             background:
               "radial-gradient(closest-side, rgb(var(--accent) / 0.18), transparent 70%)",

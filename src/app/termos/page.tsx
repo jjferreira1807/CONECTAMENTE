@@ -10,9 +10,10 @@ export default function TermosPage() {
       <h1 className="heading-display text-4xl md:text-5xl mt-3">Termos de utilização</h1>
       <div className="prose-soft mt-8 space-y-5">
         <p>
-          Conectamente é uma plataforma de psicoeducação. O conteúdo aqui presente
-          tem fins informativos e não constitui aconselhamento clínico, diagnóstico
-          ou tratamento médico/psicológico.
+          Conectamente é uma plataforma psicoeducativa de bem-estar digital. O conteúdo
+          aqui presente tem fins informativos e de autorregulação — não constitui
+          aconselhamento profissional, avaliação clínica nem tratamento médico ou
+          psicológico, e não substitui acompanhamento por um(a) profissional qualificado(a).
         </p>
         <p>
           Em caso de sofrimento psicológico significativo, procura um profissional

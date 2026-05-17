@@ -41,12 +41,18 @@ import { useMarkAppReady } from "./AppReady";
 const STORAGE_KEY = "conectamente.introSeen.v2";
 
 // Phase transition times (ms from start)
+//
+// REVEAL → END is the fusion window: 1.5s during which the dark backdrop
+// dissolves fast (revealing the homepage that's already animating in behind
+// us) while the brain SVG drifts upward and fades slowly. markReady() fires
+// at REVEAL — NOT at END — so the homepage's own entrance animations run
+// underneath the dissolve rather than after a hard cut.
 const T = {
   brain:    1500,
   neurons:  4500,
   climax:   7500,
   reveal:   9500,
-  end:     10500,
+  end:     11000,
 };
 
 type Phase = "cosmos" | "brain" | "neurons" | "climax" | "reveal";
@@ -88,12 +94,19 @@ export function IntroCutscene() {
   const [decision, setDecision] = useState<Decision>("undecided");
   const [phase, setPhase] = useState<Phase>("cosmos");
 
-  // Decide whether to play
+  // Decide whether to play.
+  //
+  // The cutscene runs on every page load — it's part of the product. Two
+  // exceptions:
+  //   • prefers-reduced-motion (accessibility);
+  //   • /auth/* routes — we land here briefly returning from Google OAuth
+  //     and immediately router.replace to the destination; playing a 10s
+  //     cutscene mid-handshake would feel like a hard refresh, which is
+  //     exactly what we're fixing.
   useEffect(() => {
     if (typeof window === "undefined") return;
-    let seen = false;
-    try { seen = localStorage.getItem(STORAGE_KEY) === "1"; } catch {}
-    setDecision(force || (!seen && !reduce) ? "play" : "skip");
+    const onAuthRoute = window.location.pathname.startsWith("/auth/");
+    setDecision(((reduce && !force) || onAuthRoute) ? "skip" : "play");
   }, [force, reduce]);
 
   // Coordinate with the SSR <IntroBlocker /> overlay
@@ -117,14 +130,16 @@ export function IntroCutscene() {
   }, [decision, markReady]);
 
   // Phase timeline via setTimeout chain (NOT RAF — keeps React renders low).
+  // Fire markReady() at REVEAL (not END) so Hero's entrance animates
+  // underneath while the backdrop and brain are still visibly dissolving.
   useEffect(() => {
     if (decision !== "play") return;
     const timers: ReturnType<typeof setTimeout>[] = [
       setTimeout(() => setPhase("brain"),   T.brain),
       setTimeout(() => setPhase("neurons"), T.neurons),
       setTimeout(() => setPhase("climax"),  T.climax),
-      setTimeout(() => setPhase("reveal"),  T.reveal),
-      setTimeout(() => finish(),             T.end),
+      setTimeout(() => { setPhase("reveal"); markReady(); }, T.reveal),
+      setTimeout(() => finish(),            T.end),
     ];
     return () => timers.forEach(clearTimeout);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -143,7 +158,8 @@ export function IntroCutscene() {
 
   function finish() {
     try { localStorage.setItem(STORAGE_KEY, "1"); } catch {}
-    // Fire app-ready BEFORE we visually fade so Hero animates during exit.
+    // markReady() usually fires at REVEAL; the call here is a safety net for
+    // the Esc/Enter/skip-button paths that bypass the phase timeline.
     markReady();
     setDecision("done");
   }
@@ -153,6 +169,8 @@ export function IntroCutscene() {
   const gold = phase === "climax" || phase === "reveal";
   const stroke = gold ? GOLD : TEAL;
 
+  const exiting = phase === "reveal";
+
   return (
     <motion.div
       role="dialog"
@@ -161,42 +179,72 @@ export function IntroCutscene() {
       className="fixed inset-0 z-[210] overflow-hidden"
       initial={{ opacity: 1 }}
       animate={{ opacity: decision === "done" ? 0 : 1 }}
-      transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-      onAnimationComplete={() => {
-        // When the exit fade completes we'd remove this from the tree by
-        // setting decision to a sentinel — but `null` return above already
-        // covers it; this is just a safety net.
-      }}
+      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
       style={{
-        background:
-          "radial-gradient(120% 80% at 50% 50%, #0a1322 0%, #04060a 60%, #000 100%)",
-        pointerEvents: phase === "reveal" || decision === "done" ? "none" : "auto",
+        pointerEvents: exiting || decision === "done" ? "none" : "auto",
         willChange: "opacity",
       }}
     >
-      {/* SCENE 1 — stars (CSS-only twinkle, 30 elements, zero JS work) */}
-      <Stars />
+      {/*
+        Fusion exit (REVEAL phase) is layered so it doesn't feel like a cut:
+          • Backdrop + stars dissolve FAST (0.7s) — homepage appears behind.
+          • Brain group drifts up + scales + fades SLOWER (1.5s) — it's the
+            last thing on screen, gracefully ceding to the homepage's hero.
+          • Warm climax bloom retreats to 0 (was 0.4 — competed with reveal).
+          • Hard white wash removed — replaced by the dissolve.
+      */}
 
-      {/* Single ambient orb — replaces 3 expensive blurred fog blobs */}
-      <div
+      {/* LAYER 1 — dark backdrop + ambient halo (dissolves first) */}
+      <motion.div
         aria-hidden
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            "radial-gradient(50% 60% at 50% 50%, rgba(110,200,175,0.10), transparent 70%)",
+            "radial-gradient(120% 80% at 50% 50%, #0a1322 0%, #04060a 60%, #000 100%)",
+          willChange: "opacity",
         }}
+        initial={{ opacity: 1 }}
+        animate={{ opacity: exiting ? 0 : 1 }}
+        transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
       />
 
-      {/* SVG core — no parent zoom, no drop-shadow filters */}
-      <div className="absolute inset-0 flex flex-col items-center justify-center px-6">
+      {/* Stars + soft teal halo travel with the backdrop */}
+      <motion.div
+        aria-hidden
+        className="absolute inset-0 pointer-events-none"
+        style={{ willChange: "opacity" }}
+        initial={{ opacity: 1 }}
+        animate={{ opacity: exiting ? 0 : 1 }}
+        transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <Stars />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(50% 60% at 50% 50%, rgba(110,200,175,0.10), transparent 70%)",
+          }}
+        />
+      </motion.div>
+
+      {/* LAYER 2 — brain + title + progress (drifts upward, fades slower) */}
+      <motion.div
+        className="absolute inset-0 flex flex-col items-center justify-center px-6"
+        style={{ willChange: "transform, opacity" }}
+        initial={{ opacity: 1, scale: 1, y: 0 }}
+        animate={{
+          opacity: exiting ? 0 : 1,
+          scale:   exiting ? 1.06 : 1,
+          y:       exiting ? -28 : 0,
+        }}
+        transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
+      >
         <BrainCore phase={phase} gold={gold} stroke={stroke} />
-
         <Title />
-
         <ProgressLine phase={phase} />
-      </div>
+      </motion.div>
 
-      {/* SCENE 5 — warm bloom (opacity-only, no mix-blend-mode) */}
+      {/* Warm bloom — opacity-only, retreats during reveal */}
       <motion.div
         aria-hidden
         className="absolute inset-0 pointer-events-none"
@@ -207,36 +255,23 @@ export function IntroCutscene() {
         }}
         initial={{ opacity: 0 }}
         animate={{
-          opacity:
-            phase === "climax" ? 0.7
-            : phase === "reveal" ? 0.4
-            : 0,
+          opacity: phase === "climax" ? 0.7 : 0,
         }}
         transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
       />
 
-      {/* Soft warm wash near the end — replaces hard white flash */}
-      <motion.div
-        aria-hidden
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: "rgba(255,240,215,1)",
-          willChange: "opacity",
-        }}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: phase === "reveal" ? 0.25 : 0 }}
-        transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-      />
-
-      {/* Skip button */}
-      <button
+      {/* Skip button — also fades during reveal so it doesn't linger */}
+      <motion.button
         type="button"
         onClick={finish}
         aria-label="Saltar intro"
         className="absolute bottom-6 right-6 z-10 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 h-10 text-xs uppercase tracking-[0.2em] text-white/70 backdrop-blur-md transition hover:bg-white/10 hover:text-white"
+        initial={{ opacity: 1 }}
+        animate={{ opacity: exiting ? 0 : 1 }}
+        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
       >
         Saltar intro
-      </button>
+      </motion.button>
     </motion.div>
   );
 }

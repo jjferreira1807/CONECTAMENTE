@@ -26,21 +26,23 @@ export function EpisodeHeader({
 }: Props) {
   return (
     <header
-      className={"relative overflow-hidden border-b border-border/60 bg-gradient-to-br " + themeColor}
+      className={"relative overflow-hidden border-b border-border/60 bg-gradient-to-br dark:bg-none " + themeColor}
     >
-      {/* Multi-layer ambient */}
+      {/* Multi-layer ambient — rendered as the first child so it sits behind
+          everything else in the header via DOM order, without needing a
+          negative z-index. Hidden em dark mode para um fundo coeso e plano. */}
       <div
         aria-hidden
-        className="absolute inset-0 -z-0"
+        className="absolute inset-0 pointer-events-none dark:hidden"
         style={{
           background:
             "radial-gradient(60% 80% at 80% 0%, rgb(var(--accent) / 0.22), transparent 70%), radial-gradient(40% 60% at 10% 100%, rgb(var(--accent-2) / 0.18), transparent 70%)",
         }}
       />
-      {/* Breathing orb */}
+      {/* Breathing orb — also dark-hidden by the same rationale. */}
       <motion.div
         aria-hidden
-        className="absolute -top-32 right-[8%] w-[420px] h-[420px] rounded-full pointer-events-none"
+        className="absolute -top-32 right-[8%] w-[420px] h-[420px] rounded-full pointer-events-none dark:hidden"
         style={{
           background:
             "radial-gradient(closest-side, rgb(var(--accent) / 0.35), transparent 70%)",
