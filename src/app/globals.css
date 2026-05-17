@@ -353,6 +353,16 @@ html.theme-switching *::after {
   }
   .glass { background: rgb(var(--surface) / 0.92); }
   .glass-strong { background: rgb(var(--surface) / 0.96); }
+
+  /* Atmosphere: esconder os 3 blurs gigantes + 4 partículas em touch devices.
+   * Cada um custa ~60-80px de blur radius em layers compositor enormes
+   * (70vmax). Combinado, são o que esmaga o GPU do iPhone — causando o
+   * "tap delay" e o bug "conteúdo desaparece durante scroll" (Safari mobile
+   * descarrega paint layers quando GPU sobrecarregado). Mantemos as estrelas
+   * + vignette (cheap, visual signature). */
+  .atmosphere-heavy {
+    display: none !important;
+  }
 }
 
 /* Print =================================================================== */

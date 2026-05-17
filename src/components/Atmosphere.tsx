@@ -40,7 +40,11 @@ export function Atmosphere() {
       style={{
         opacity: visible ? 1 : 0,
         transition: "opacity 1.4s cubic-bezier(0.22, 1, 0.36, 1)",
-        contain: "strict",
+        // `contain: strict` removido — em iOS Safari, combinado com children
+        // pesados (blurs grandes, transforms) causava o bug "conteúdo
+        // desaparece durante scroll": compositor descarregava paint layers
+        // e demorava a recompor. Sem strict, o paint behaviour é mais
+        // tolerante (custa um pouco mais em desktop, irrelevante).
         willChange: "opacity",
       }}
     >
@@ -50,7 +54,7 @@ export function Atmosphere() {
           frame da animação drift. Crucial em mobile onde o blur é caro. */}
       <div className="absolute inset-0">
         <div
-          className="absolute -top-[20%] -left-[10%] h-[70vmax] w-[70vmax] rounded-full opacity-70"
+          className="atmosphere-heavy absolute -top-[20%] -left-[10%] h-[70vmax] w-[70vmax] rounded-full opacity-70"
           style={{
             background:
               "radial-gradient(closest-side, rgb(var(--accent) / 0.35), transparent 70%)",
@@ -60,7 +64,7 @@ export function Atmosphere() {
           }}
         />
         <div
-          className="absolute -bottom-[20%] -right-[10%] h-[60vmax] w-[60vmax] rounded-full opacity-60"
+          className="atmosphere-heavy absolute -bottom-[20%] -right-[10%] h-[60vmax] w-[60vmax] rounded-full opacity-60"
           style={{
             background:
               "radial-gradient(closest-side, rgb(var(--accent-2) / 0.28), transparent 70%)",
@@ -70,7 +74,7 @@ export function Atmosphere() {
           }}
         />
         <div
-          className="absolute top-[40%] left-[55%] h-[45vmax] w-[45vmax] rounded-full opacity-40 hidden md:block"
+          className="atmosphere-heavy absolute top-[40%] left-[55%] h-[45vmax] w-[45vmax] rounded-full opacity-40 hidden md:block"
           style={{
             background:
               "radial-gradient(closest-side, rgb(var(--glow) / 0.18), transparent 70%)",
@@ -154,7 +158,7 @@ function Particles() {
       {PARTICLES.map((p, i) => (
         <span
           key={i}
-          className="absolute rounded-full"
+          className="atmosphere-heavy absolute rounded-full"
           style={{
             left: `${p.x}%`,
             top: `${p.y}%`,
