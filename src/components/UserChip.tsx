@@ -83,9 +83,21 @@ export function useSupabaseUser(): { user: SessionUser | null; ready: boolean } 
   return { user, ready };
 }
 
+/**
+ * Normaliza URLs de avatar do Google. Strip do sufixo de tamanho que a
+ * Supabase às vezes guarda em formato problemático (`=s96-c`, `=s400-c`)
+ * e força `=s96-c` que costuma estar sempre disponível na CDN do Google.
+ */
+function normalizeAvatarUrl(url: string | null): string | null {
+  if (!url) return null;
+  if (!/googleusercontent\.com/.test(url)) return url;
+  return url.replace(/=s\d+(-c)?$/, "") + "=s96-c";
+}
+
 export function UserChip({ className }: { className?: string }) {
   const { user } = useSupabaseUser();
   const [open, setOpen] = useState(false);
+  const [imgError, setImgError] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
@@ -139,15 +151,16 @@ export function UserChip({ className }: { className?: string }) {
         aria-expanded={open}
         className="inline-flex items-center gap-2 rounded-full hairline bg-surface/80 pl-1 pr-2.5 h-10 hover:bg-ink/5 transition-colors"
       >
-        {user.avatar ? (
+        {user.avatar && !imgError ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={user.avatar}
+            src={normalizeAvatarUrl(user.avatar) ?? user.avatar}
             alt=""
             width={28}
             height={28}
             referrerPolicy="no-referrer"
             loading="lazy"
+            onError={() => setImgError(true)}
             className="h-7 w-7 rounded-full object-cover"
           />
         ) : (
