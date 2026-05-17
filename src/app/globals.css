@@ -85,25 +85,35 @@ html {
   padding-top: env(safe-area-inset-top, 0);
   padding-bottom: env(safe-area-inset-bottom, 0);
   overflow-x: hidden;
-  /* Mobile UX: remove o highlight cinzento default do iOS (focus-visible já
-   * dá feedback claro de teclado; a paleta é gerida pela nossa CSS). */
-  -webkit-tap-highlight-color: transparent;
+  /* Tap-highlight subtil em teal — feedback visual NATIVO instantâneo (acontece
+   * antes do JS reagir, dando percepção de "sub-50ms" mesmo com React no meio).
+   * 0.18 alpha mantém-se elegante e funciona em ambos os temas. */
+  -webkit-tap-highlight-color: rgb(var(--accent) / 0.18);
 }
 
 /*
- * Touch optimisation universal — `touch-action: manipulation` remove os
- * ~300ms de delay para tap-detection e impede double-tap zoom em todos os
- * controles. Aplicado em interactivos, não no documento inteiro (manter
- * pinch-zoom em texto/imagens para acessibilidade).
+ * Universal `touch-action: manipulation` — elimina o delay de ~300ms
+ * (double-tap-zoom detection) em TODOS os elementos clicáveis, incluindo
+ * `div onClick`, cards, etc. `manipulation` mantém pan e pinch-zoom no
+ * documento (texto continua zoomable para acessibilidade), apenas
+ * desliga a heurística de double-tap. Seguro globalmente.
  */
-button,
-a,
-[role="button"],
-input,
-textarea,
-select,
-label {
+* {
   touch-action: manipulation;
+}
+
+/*
+ * Feedback visual instantâneo para qualquer elemento clicável.
+ * Dispara no momento exacto do `:active` pseudo-state (browser-nativo,
+ * antes de qualquer handler React executar). Garante percepção de
+ * resposta sub-50ms mesmo em handlers JS mais pesados. Curto e subtil.
+ */
+button:active,
+a:active,
+[role="button"]:active,
+.cursor-pointer:active {
+  opacity: 0.85;
+  transition: opacity 0.05s linear;
 }
 
 body {
