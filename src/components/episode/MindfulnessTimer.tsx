@@ -140,7 +140,7 @@ export function MindfulnessTimer({
               key={p}
               onClick={() => choose(p)}
               className={cn(
-                "px-3.5 py-1.5 rounded-full text-sm transition-all duration-300",
+                "px-3.5 py-1.5 rounded-full text-sm transition duration-300",
                 duration === p
                   ? "bg-ink text-bg shadow-soft"
                   : "bg-ink/5 text-ink hover:bg-ink/10"

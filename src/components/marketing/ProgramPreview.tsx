@@ -42,7 +42,7 @@ export function ProgramPreview() {
             <motion.div key={ep.slug} variants={fadeUp}>
               <Link
                 href={`/programa/${ep.slug}`}
-                className="group relative block overflow-hidden rounded-3xl border border-border/60 bg-surface/70 backdrop-blur-md transition-all duration-500 ease-cinematic hover:border-accent/30 hover:-translate-y-1 hover:shadow-glow"
+                className="group relative block overflow-hidden rounded-3xl border border-border/60 bg-surface/70 backdrop-blur-md transition duration-500 ease-cinematic hover:border-accent/30 hover:-translate-y-1 hover:shadow-glow"
               >
                 <div
                   className={"h-36 relative bg-gradient-to-br " + ep.themeColor}

@@ -18,7 +18,7 @@ export function EpisodeRoadmap() {
             <Link
               href={`/programa/${ep.slug}`}
               className={cn(
-                "block hairline rounded-2xl p-4 transition-all hover:bg-ink/5",
+                "block hairline rounded-2xl p-4 transition hover:bg-ink/5",
                 done && "bg-success/8"
               )}
             >

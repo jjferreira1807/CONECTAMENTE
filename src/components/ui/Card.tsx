@@ -10,7 +10,7 @@ export function Card({ className, ...rest }: HTMLAttributes<HTMLDivElement>) {
     <div
       className={cn(
         "card p-6 md:p-7 shadow-soft",
-        "transition-all duration-500 ease-cinematic",
+        "transition duration-500 ease-cinematic",
         "hover:shadow-glow hover:border-accent/30",
         className
       )}
@@ -33,7 +33,7 @@ export function FeatureCard({ className, ...rest }: HTMLAttributes<HTMLDivElemen
         "relative rounded-2xl p-6 md:p-7",
         "bg-gradient-to-br from-elevated/90 to-surface/70",
         "border border-border/60 backdrop-blur-md shadow-cinematic",
-        "transition-all duration-500 ease-cinematic",
+        "transition duration-500 ease-cinematic",
         "hover:border-accent/30",
         className
       )}

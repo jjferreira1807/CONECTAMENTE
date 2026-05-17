@@ -80,7 +80,7 @@ export function JourneyList({ episodes }: Props) {
               href={`/programa/${e.slug}`}
               className={cn(
                 "relative block rounded-3xl overflow-hidden border border-border/60 backdrop-blur-md",
-                "bg-surface/70 transition-all duration-500 ease-cinematic",
+                "bg-surface/70 transition duration-500 ease-cinematic",
                 "hover:border-accent/30 hover:-translate-y-0.5 hover:shadow-glow",
                 "group"
               )}
