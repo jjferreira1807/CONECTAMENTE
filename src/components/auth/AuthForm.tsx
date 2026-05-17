@@ -134,10 +134,15 @@ export function AuthForm() {
 
       <form onSubmit={onSubmit} className="space-y-4">
         <Field icon={<Mail className="h-4 w-4" />} label="Email">
+          {/* `text-base` (16px) é crítico — iOS Safari faz zoom automático em
+              qualquer input < 16px, deslocando o layout e empurrando o teclado
+              de forma desconfortável. `inputMode="email"` mostra o teclado
+              email-optimised (com @ e .com). */}
           <input
             type="email" required autoComplete="email"
+            inputMode="email" enterKeyHint="next"
             value={email} onChange={(e) => setEmail(e.target.value)}
-            className="w-full bg-transparent outline-none text-[15px]"
+            className="w-full bg-transparent outline-none text-base"
             placeholder="o-teu@email.pt"
           />
         </Field>
@@ -145,8 +150,9 @@ export function AuthForm() {
           <input
             type="password" required minLength={8}
             autoComplete={mode === "signup" ? "new-password" : "current-password"}
+            enterKeyHint={mode === "signup" ? "done" : "go"}
             value={password} onChange={(e) => setPassword(e.target.value)}
-            className="w-full bg-transparent outline-none text-[15px]"
+            className="w-full bg-transparent outline-none text-base"
             placeholder="mínimo 8 caracteres"
           />
         </Field>
