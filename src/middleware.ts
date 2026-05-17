@@ -29,11 +29,23 @@ const PROTECTED_API_PREFIXES = [
 ];
 
 export async function middleware(req: NextRequest) {
+  const path = req.nextUrl.pathname;
+
+  // Skip Supabase auth update no callback OAuth — o getUser() server-side
+  // mexe nos cookies sb-* (em particular o `*-code-verifier` do PKCE), o
+  // que faz com que o exchangeCodeForSession() do client-side falhe com
+  // `pkce_code_verifier_not_found`. A callback page gere o seu próprio
+  // auth client-side, não precisa do refresh aqui.
+  if (path.startsWith("/auth/")) {
+    const res = NextResponse.next();
+    applySecurityHeaders(res);
+    return res;
+  }
+
   const { res, user } = await updateSession(req);
 
   applySecurityHeaders(res);
 
-  const path = req.nextUrl.pathname;
   const supabaseConfigured =
     !!process.env.NEXT_PUBLIC_SUPABASE_URL &&
     !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
