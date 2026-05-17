@@ -56,8 +56,15 @@ export async function GET(req: NextRequest) {
 
   const { error } = await supabase.auth.exchangeCodeForSession(code);
   if (error) {
+    // Diagnóstico temporário: incluir nomes dos cookies sb-* presentes
+    // para perceber se o verifier está a chegar à request.
+    const sbCookieNames = cookieStore
+      .getAll()
+      .filter((c) => c.name.startsWith("sb-"))
+      .map((c) => c.name)
+      .join(",");
     return NextResponse.redirect(
-      `${origin}/entrar?error=${encodeURIComponent(error.code ?? "unknown")}`
+      `${origin}/entrar?error=${encodeURIComponent(error.code ?? "unknown")}&sb=${encodeURIComponent(sbCookieNames || "none")}`
     );
   }
 
