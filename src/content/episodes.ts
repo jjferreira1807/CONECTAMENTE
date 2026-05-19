@@ -59,10 +59,10 @@ export const episodes: Episode[] = [
     slug: "bem-vindo",
     number: 1,
     kicker: "Boas-vindas",
-    title: "Bem-vindo a Conectamente",
+    title: "Bem-vindo ao podcast Conectamente",
     subtitle: "Como vamos trabalhar juntos nas próximas semanas",
     description:
-      "Uma introdução honesta ao programa, ao método e ao teu papel — sem promessas mágicas, com um caminho claro.",
+      "Apresentação do podcast e criação de um espaço seguro sem julgamento. Explicação do conceito de uso excessivo da internet. Atividade de Grounding (DBT) — descreve o que está a ver. Auto-reflexão sobre a tua presença e relação com a internet. Definição de intenção pessoal para o programa. Tarefa de casa: observar e registar comportamentos digitais do dia a dia.",
     durationMin: 12,
     themeColor: "from-accent/30 to-accent2/20",
     sections: [
@@ -118,10 +118,10 @@ export const episodes: Episode[] = [
     slug: "uso-excessivo-pensamentos",
     number: 2,
     kicker: "Uso excessivo · parte I",
-    title: "Os pensamentos que nos levam ao ecrã",
+    title: "Compreender o uso excessivo da internet: o teu cérebro e os estímulos",
     subtitle: "Crenças automáticas e o ciclo cognitivo",
     description:
-      "Identificar os pensamentos que aparecem antes do gesto. Aplicar o registo de pensamentos da TCC ao uso digital.",
+      "Como se desenvolvem hábitos digitais excessivos e o papel do reforço e recompensa imediata. Como notificações, scroll infinito, likes e vídeos curtos mantêm o comportamento. Psicoeducação sobre o ciclo: impulso → uso → alívio/recompensa → repetição. Atividade TCC: mapeamento inicial de comportamentos digitais. Tarefa de casa: escrever uma frase de compromisso e registar sentimentos associados aos comportamentos digitais.",
     durationMin: 18,
     themeColor: "from-accent/30 to-accent2/10",
     sections: [
@@ -161,10 +161,10 @@ export const episodes: Episode[] = [
     slug: "uso-excessivo-comportamentos",
     number: 3,
     kicker: "Uso excessivo · parte II",
-    title: "Comportamentos e técnicas de controlo",
+    title: "Explorar os comportamentos digitais e retomar o controlo — explorando o uso automático e uso problemático",
     subtitle: "Romper o automatismo com pequenas fricções",
     description:
-      "Ferramentas práticas: regras ambientais, técnica dos 90 segundos, urge surfing, substituição comportamental.",
+      "Identificar padrões de uso excessivo e diferenciar uso funcional, automático e problemático. Promover sensação de controlo sobre os ecrãs. Psicoeducação sobre uso problemático e o seu impacto nas atividades diárias. Atividade de Grounding (DBT) — consciência corporal. Tarefa de casa: escolher um comportamento a reduzir com recompensas imediatas; sugestões como desativar notificações, modo avião e zonas sem ecrãs.",
     durationMin: 20,
     themeColor: "from-accent/30 to-accent2/15",
     sections: [
@@ -203,10 +203,10 @@ export const episodes: Episode[] = [
     slug: "sono",
     number: 4,
     kicker: "Sono",
-    title: "Higiene do sono e o impacto da internet",
+    title: "Uso da internet: O que penso? O que sinto?",
     subtitle: "Por que o teu telemóvel é o ladrão silencioso de horas",
     description:
-      "Como a luz azul, a estimulação cognitiva e o cortisol nocturno minam o sono — e o que fazer.",
+      "Introdução à relação entre situação, pensamento, emoção e comportamento. Reconhecer pensamentos automáticos associados ao uso da internet (ex: \"Só vou ver cinco minutos\", \"Preciso de responder já\"). Criar pensamentos alternativos mais realistas. Atividade de Grounding (DBT). Tarefa de casa: preencher tabela com situação, pensamento, emoção, comportamento e alternativa mais útil.",
     durationMin: 16,
     themeColor: "from-accent/40 to-accent2/10",
     sections: [
@@ -251,10 +251,10 @@ export const episodes: Episode[] = [
     slug: "tcc-conversa",
     number: 5,
     kicker: "TCC",
-    title: "Como funciona uma conversa terapêutica",
+    title: "Sono, ecrãs e regulação emocional",
     subtitle: "Psicoeducação: pensamento, emoção, comportamento",
     description:
-      "O modelo cognitivo de Beck e como o aplicamos a hábitos digitais — sem mistificações.",
+      "Impacto do sono no humor, ansiedade, atenção e autocontrolo. Como os ecrãs interferem com o sono. Princípios básicos de higiene do sono. Atividade de Relaxamento Progressivo (Mindfulness). Planeamento de rotina de sono com redução gradual de ecrãs 60 minutos antes de dormir. Tarefa de casa: diário do sono e rotina sem ecrãs durante uma semana.",
     durationMin: 22,
     themeColor: "from-accent/25 to-accent2/20",
     sections: [
@@ -293,10 +293,10 @@ export const episodes: Episode[] = [
     slug: "recompensa-cerebro",
     number: 6,
     kicker: "Recompensa · parte I",
-    title: "O cérebro e o circuito da recompensa",
+    title: "Conectar ao presente e não ao ecrã",
     subtitle: "Dopamina, novidade e por que tudo isto é tão difícil",
     description:
-      "Neurociência acessível: como apps e redes activam o circuito da recompensa — e por que isso não é uma sentença.",
+      "O que é mindfulness de forma simples. Reconhecer o piloto automático digital e treinar a capacidade de parar, observar e escolher antes de agir. Atividade: Técnica da uva-passa (Mindfulness). Atividade: Observação consciente dos pensamentos. Tarefa de casa: pausa consciente antes do ecrã — parar, respirar e perguntar \"O que sinto? O que penso? O que estou à procura?\"",
     durationMin: 18,
     themeColor: "from-accent/35 to-accent2/15",
     sections: [
@@ -335,10 +335,10 @@ export const episodes: Episode[] = [
     slug: "recompensa-tecnicas",
     number: 7,
     kicker: "Recompensa · parte II",
-    title: "Técnicas práticas de equilíbrio",
+    title: "Ansiedade e urgência digital",
     subtitle: "Janelas digitais, pausas realistas e regras de uso",
     description:
-      "Estratégias estruturadas para encontrar equilíbrio digital, sem proibições absurdas.",
+      "Relação entre ansiedade e uso excessivo da internet. Trabalhar o medo de perder algo e o desconforto de estar offline. Atividade: Respiração consciente (Mindfulness). Atividade DBT: técnica ACCEPTS. Tarefa de casa: experiência de ficar sem telemóvel 10 a 15 minutos e usar a técnica ACCEPTS para realizar outras atividades.",
     durationMin: 20,
     themeColor: "from-accent/30 to-accent2/20",
     sections: [
@@ -377,10 +377,10 @@ export const episodes: Episode[] = [
     slug: "isolamento",
     number: 8,
     kicker: "Isolamento",
-    title: "Reaprender a estar com pessoas",
+    title: "Quando me sinto em baixo: uso digital como fuga emocional",
     subtitle: "A diferença entre conexão online e contacto humano",
     description:
-      "O paradoxo da hiperconexão: estar sempre online e sentir-se só. O que se sabe sobre conexão real — e como começar pequeno.",
+      "Relação entre humor deprimido, inatividade e uso excessivo da internet. Identificar quando o uso digital funciona como fuga emocional e compreender o ciclo da inatividade. Atividade DBT: Auto-validação emocional. Tarefa de casa: realizar uma pequena ação fora do ecrã e partilhar com a comunidade #Conectamente.",
     durationMin: 17,
     themeColor: "from-accent/25 to-accent2/25",
     sections: [
@@ -418,10 +418,10 @@ export const episodes: Episode[] = [
     slug: "ansiedade",
     number: 9,
     kicker: "Ansiedade",
-    title: "Quando a ansiedade pede ecrã",
+    title: "\"Phubbing\": reconectar às relações presenciais",
     subtitle: "Meditação guiada e estratégias de regulação",
     description:
-      "A ansiedade pede distracção; o telemóvel oferece-a. Esta sessão treina uma resposta diferente, com base em mindfulness e regulação respiratória.",
+      "Diferença entre conexão digital e conexão presencial. Explorar o sentimento de pertença e o impacto do phubbing nas relações. Atividade TCC: identificação de pensamentos automáticos com imagética. Atividade TCC: descoberta guiada do círculo de amizades. Tarefa de casa: desenhar três círculos de relações e escolher uma ação de reconexão presencial.",
     durationMin: 22,
     themeColor: "from-accent2/25 to-accent/30",
     sections: [
@@ -465,10 +465,10 @@ export const episodes: Episode[] = [
     slug: "depressao",
     number: 10,
     kicker: "Depressão",
-    title: "Quando o ecrã é refúgio do nada",
+    title: "Alternativas ao ecrã: construir uma vida offline",
     subtitle: "Psicoeducação, ativação comportamental e quando procurar ajuda",
     description:
-      "A relação bidireccional entre uso excessivo e sintomas depressivos. Quando os exercícios chegam — e quando não.",
+      "Encontrar alternativas reais e viáveis ao uso da internet. Importância de atividades físicas, criativas, sociais e de descanso. Barreiras para uma comunicação interpessoal eficaz. Atividade Mindfulness: observação de pensamentos. Tarefa de casa: atividade fora de casa e prática de distanciamento dos pensamentos automáticos.",
     durationMin: 19,
     themeColor: "from-accent/20 to-accent2/30",
     sections: [
@@ -516,10 +516,10 @@ export const episodes: Episode[] = [
     slug: "conclusao",
     number: 11,
     kicker: "Conclusão",
-    title: "O que levamos daqui",
+    title: "Intenções para o futuro: consolidação e aprendizagens",
     subtitle: "Definir intenções para os próximos 90 dias",
     description:
-      "Consolidação. Ferramentas favoritas, cenários difíceis previsíveis, plano pessoal.",
+      "Consolidar as principais aprendizagens do programa. Reforçar a evolução ao longo dos episódios e definir intenções futuras. Atividade Mindfulness: Desfusão cognitiva — imaginar pensamentos escritos na areia sendo apagados pelo vento. Tarefa de casa: escrever uma carta ao \"eu futuro\" sobre o percurso e as mudanças alcançadas.",
     durationMin: 15,
     themeColor: "from-accent/30 to-accent2/30",
     sections: [
@@ -561,10 +561,10 @@ export const episodes: Episode[] = [
     slug: "trabalho-para-casa",
     number: 12,
     kicker: "Trabalho para casa",
-    title: "Fichas, exercícios e plano pessoal",
+    title: "Quando o caminho não é linear: como recuperar o equilíbrio",
     subtitle: "O teu kit para os próximos 90 dias",
     description:
-      "Compilação de fichas descarregáveis, exercícios para repetir e um plano de revisão semanal.",
+      "Compreender que recaídas fazem parte do processo de mudança. Identificar sinais de alerta de regresso ao uso excessivo. Atividade Mindfulness: prática de não julgamento — transformar pensamentos críticos em descrições factuais. Tarefa de casa: criação de um plano pessoal de prevenção de recaídas com ações concretas para momentos de maior risco.",
     durationMin: 10,
     themeColor: "from-accent2/30 to-accent/30",
     sections: [
