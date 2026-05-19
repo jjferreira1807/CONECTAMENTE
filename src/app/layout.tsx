@@ -81,6 +81,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       suppressHydrationWarning
       className={`${inter.variable} ${lora.variable}`}
     >
+      <head>
+        <link rel="preconnect" href="https://open.spotify.com" crossOrigin="anonymous" />
+      </head>
       <body className="min-h-screen antialiased">
         <a
           href="#main"
