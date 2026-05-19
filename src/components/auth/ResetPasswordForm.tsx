@@ -26,7 +26,7 @@ export function ResetPasswordForm() {
       const j = await r.json();
       if (!j.ok) throw new Error(j.error?.message ?? "Erro");
       setDone(true);
-      setTimeout(() => { window.location.href = "/dashboard"; }, 1200);
+      setTimeout(() => { window.location.href = "/dashboard"; }, 400);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Erro");
     } finally {
