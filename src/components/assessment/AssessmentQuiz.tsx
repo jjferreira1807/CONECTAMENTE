@@ -14,6 +14,7 @@ import {
 } from "@/content/assessment";
 import { useProgress } from "@/lib/store";
 import { useAnimatedNumber } from "@/lib/useAnimatedNumber";
+import { useSupabaseUser } from "@/components/UserChip";
 
 /**
  * Auto-reflexão · multi-step UI integrada na linguagem visual existente.
@@ -40,9 +41,11 @@ export function AssessmentQuiz() {
   const [stepIndex, setStepIndex] = useState(0);
 
   const saveAssessment = useProgress((s) => s.saveAssessment);
-  // Detecta se já existe baseline: nesse caso esta toma é um pós-teste e a
-  // UI deve enquadrar como "comparação", não como "primeira vez".
-  const hasBaseline = useProgress((s) => s.baselineAssessment() !== undefined);
+  // Pós-teste só quando o utilizador tem sessão Google E pelo menos um
+  // assessment já feito. Caso contrário, é tratado como primeira vez.
+  const { user } = useSupabaseUser();
+  const hasAssessment = useProgress((s) => s.assessments.length >= 1);
+  const isFollowup = !!user && hasAssessment;
 
   const total = ASSESSMENT_QUESTIONS.length;
   const allAnswered = answers.every((a) => typeof a === "number");
@@ -111,7 +114,7 @@ export function AssessmentQuiz() {
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.6, ease: CINEMATIC }}
           >
-            <Intro onStart={startQuiz} isFollowup={hasBaseline} />
+            <Intro onStart={startQuiz} isFollowup={isFollowup} />
           </motion.div>
         )}
 
@@ -266,7 +269,7 @@ function Intro({
           disabled={!accepted}
           className="gap-2 group disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isFollowup ? "Começar pós-teste" : "Começar"}
+          {isFollowup ? "Começar pós-teste" : "Começar auto-reflexão"}
           <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
         </Button>
         <Link href="/programa">
