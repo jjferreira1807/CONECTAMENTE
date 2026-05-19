@@ -66,12 +66,10 @@ export function AuthForm() {
     setLoading(true);
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      // Login OAuth aterra primeiro no quiz de auto-reflexão (baseline na
-      // primeira visita, follow-up nas seguintes) — depois o utilizador
-      // segue para o programa/dashboard. Apontar o `next` directamente
-      // para /auto-reflexao evita o flicker de passar por /dashboard antes
-      // do QuizGate corrigir a rota.
-      options: { redirectTo: `${window.location.origin}/auth/callback?next=/auto-reflexao` },
+      // Após login bem-sucedido o utilizador autenticado vai directo para
+      // /programa. A cutscene e o QuizGate sabem detectar a sessão e saltam,
+      // por isso não há flicker de passagem por /auto-reflexao.
+      options: { redirectTo: `${window.location.origin}/auth/callback?next=/programa` },
     });
     if (error) {
       setError(error.message);

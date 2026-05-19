@@ -37,6 +37,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { useSearchParams } from "next/navigation";
 import { useMarkAppReady } from "./AppReady";
+import { hasSupabaseSession } from "@/lib/hasSupabaseSession";
 
 const STORAGE_KEY = "conectamente.introSeen.v2";
 
@@ -96,17 +97,19 @@ export function IntroCutscene() {
 
   // Decide whether to play.
   //
-  // The cutscene runs on every page load — it's part of the product. Two
-  // exceptions:
+  // The cutscene runs on every page load for anonymous visitors — it's
+  // part of the onboarding. Three exceptions skip it:
   //   • prefers-reduced-motion (accessibility);
-  //   • /auth/* routes — we land here briefly returning from Google OAuth
-  //     and immediately router.replace to the destination; playing a 10s
-  //     cutscene mid-handshake would feel like a hard refresh, which is
-  //     exactly what we're fixing.
+  //   • /auth/* routes — brief stopover returning from Google OAuth;
+  //   • authenticated users — they're past onboarding, the cutscene would
+  //     feel like the site is restarting every page load.
   useEffect(() => {
     if (typeof window === "undefined") return;
     const onAuthRoute = window.location.pathname.startsWith("/auth/");
-    setDecision(((reduce && !force) || onAuthRoute) ? "skip" : "play");
+    const isAuthenticated = hasSupabaseSession();
+    setDecision(
+      ((reduce && !force) || onAuthRoute || isAuthenticated) ? "skip" : "play",
+    );
   }, [force, reduce]);
 
   // Coordinate with the SSR <IntroBlocker /> overlay

@@ -2,6 +2,7 @@
 import { useEffect, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAppReady } from "./AppReady";
+import { hasSupabaseSession } from "@/lib/hasSupabaseSession";
 
 /**
  * Auto-reflexão · gate de entrada.
@@ -36,6 +37,12 @@ export function QuizGate() {
   useEffect(() => {
     if (!armedRef.current) return;
     if (!pathname) return;
+    // Authenticated visitors are past onboarding: they shouldn't be
+    // force-redirected to /auto-reflexao on every page load.
+    if (hasSupabaseSession()) {
+      armedRef.current = false;
+      return;
+    }
     // Skip-prefix check FIRST, antes do `!ready`. Senão, quando aterramos em
     // /auth/callback (ready=false ainda) saímos cedo sem desarmar, depois o
     // router.replace("/dashboard") muda o pathname, e quando o ready finalmente
