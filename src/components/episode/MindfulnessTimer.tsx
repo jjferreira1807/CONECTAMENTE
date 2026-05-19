@@ -129,7 +129,7 @@ export function MindfulnessTimer({
           </motion.div>
 
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <p className="text-xs uppercase tracking-[0.25em] text-muted">{label}</p>
+            <p className="text-xs uppercase tracking-[0.25em] text-muted [text-indent:0.25em]">{label}</p>
             <p className="font-serif text-4xl md:text-5xl tabular-nums mt-1">{fmt(remaining)}</p>
           </div>
         </div>
