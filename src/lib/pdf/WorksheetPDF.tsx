@@ -1,254 +1,281 @@
 /**
- * Premium PDF layout for Conectamente worksheets.
+ * Worksheet PDF — calm, intentional, non-dopaminergic.
  *
- * Aesthetic targets: Calm/Headspace journals — warm cream paper, soft amber
- * accents, serif headings, generous space. Functional content:
- *   • Episode/worksheet title + category + date
- *   • Mood pre/post (5-step scale, visual bullets)
- *   • All worksheet fields with appropriate space
- *   • Pequenas vitórias + intenções
- *   • Mini exercício de respiração
- *   • Footer with branding
+ * One typographic family (Inter), one ink colour, one subtle sage accent,
+ * generous whitespace. Page 1 holds the title, mood pre/post and main
+ * fields. Page 2 holds the 4-2-6 breathing prompt, "pequenas vitórias",
+ * "compromisso pessoal" and an optional closing line. Footer is fixed
+ * on both pages.
  *
- * The page is intentionally A4 (595×842 pt) and respects safe margins so
- * print without scaling works perfectly. All assets are in-line — no fonts
- * or images to fetch, so generation is instant and offline-friendly.
+ * Margins: 20mm sides / 18mm top-bottom (A4 595×842 pt). Hair lines and
+ * uppercase tracked labels replace the previous boxed cards. The amber
+ * rule for filled answers and the decorative orbs have been removed.
  */
-import { Document, Page, Text, View, StyleSheet, Font, Svg, Path, Circle, Line } from "@react-pdf/renderer";
+import { Document, Page, Text, View, StyleSheet, Font, Svg, Circle } from "@react-pdf/renderer";
 import type { Worksheet } from "@/content/worksheets";
 
-// Palette — warm cream paper + ink, calm amber + green accents
+// One family, four weights + italic. Hosted on jsDelivr so generation
+// stays offline-tolerant (cached by the runtime after the first fetch).
+Font.register({
+  family: "Inter",
+  fonts: [
+    { src: "https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.16/files/inter-latin-300-normal.ttf", fontWeight: 300 },
+    { src: "https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.16/files/inter-latin-400-normal.ttf", fontWeight: 400 },
+    { src: "https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.16/files/inter-latin-500-normal.ttf", fontWeight: 500 },
+    { src: "https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.16/files/inter-latin-600-normal.ttf", fontWeight: 600 },
+    { src: "https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.16/files/inter-latin-400-italic.ttf", fontWeight: 400, fontStyle: "italic" },
+  ],
+});
+
+// A4 margins: 20mm horizontal, 18mm vertical (1mm ≈ 2.835 pt)
+const MARGIN_X = 57;
+const MARGIN_Y = 51;
+
 const COLOR = {
-  paper:   "#F8F4ED",
-  ink:     "#16202A",
-  muted:   "#5C6470",
-  hair:    "#E2DAC9",
-  accent:  "#1E6E5A",   // therapeutic green
-  amber:   "#B27A3C",   // amber gold
-  amberSoft: "#F1E4CC",
-  accentSoft: "#D9E8E1",
+  paper:  "#FAFAF8",
+  ink:    "#0F1117",
+  muted:  "#6B7280",
+  hair:   "#E5E3DE",
+  accent: "#5E7166",
 };
 
 const styles = StyleSheet.create({
   page: {
-    paddingTop: 44,
-    paddingBottom: 56,
-    paddingHorizontal: 52,
+    paddingTop: MARGIN_Y,
+    paddingBottom: MARGIN_Y,
+    paddingHorizontal: MARGIN_X,
     backgroundColor: COLOR.paper,
     color: COLOR.ink,
-    fontFamily: "Helvetica",
-    fontSize: 10.5,
-    // No page-level lineHeight: it propagates to every Text and breaks the
-    // line-box maths for elements with very different fontSizes (title vs
-    // body). Each Text now sets its own lineHeight explicitly.
+    fontFamily: "Inter",
+    fontSize: 11,
+    fontWeight: 400,
   },
 
-  // Header
-  topBar: {
+  // Header band
+  header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 36,
+    marginBottom: 6,
   },
   brand: {
-    fontFamily: "Helvetica",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  brandText: {
+    fontFamily: "Inter",
+    fontWeight: 500,
     fontSize: 9,
-    letterSpacing: 4,
-    color: COLOR.muted,
+    color: COLOR.ink,
+    letterSpacing: 3,
     textTransform: "uppercase",
     lineHeight: 1.2,
   },
-  date: {
-    fontFamily: "Helvetica",
+  meta: {
+    fontFamily: "Inter",
+    fontWeight: 400,
     fontSize: 9,
     color: COLOR.muted,
+    letterSpacing: 0.4,
     lineHeight: 1.2,
+  },
+
+  // Subtle divider
+  rule: {
+    height: 1,
+    backgroundColor: COLOR.hair,
+    marginVertical: 18,
+  },
+  ruleTight: {
+    height: 1,
+    backgroundColor: COLOR.hair,
+    marginVertical: 12,
   },
 
   // Title block
   kicker: {
-    fontFamily: "Helvetica",
-    fontSize: 9,
+    fontFamily: "Inter",
+    fontWeight: 500,
+    fontSize: 8.5,
     color: COLOR.accent,
-    letterSpacing: 3,
+    letterSpacing: 2.4,
     textTransform: "uppercase",
-    marginBottom: 10,
+    marginBottom: 14,
     lineHeight: 1.2,
   },
-  // Explicit lineHeight so the title's bottom line-box descends only ~12pt
-  // below the baseline, leaving clean room for the subtitle. The previous
-  // inherited 1.5 line-height was crashing the subtitle into the title.
   title: {
-    fontFamily: "Times-Roman",
-    fontSize: 28,
+    fontFamily: "Inter",
+    fontWeight: 300,
+    fontSize: 26,
     color: COLOR.ink,
-    letterSpacing: -0.4,
-    lineHeight: 1.12,
-    marginBottom: 12,
+    letterSpacing: -0.2,
+    lineHeight: 1.15,
+    marginBottom: 10,
   },
-  subtitle: {
-    fontFamily: "Helvetica",
-    fontSize: 10.5,
+  intro: {
+    fontFamily: "Inter",
+    fontWeight: 400,
+    fontStyle: "italic",
+    fontSize: 10,
     color: COLOR.muted,
     maxWidth: 440,
     lineHeight: 1.55,
   },
 
-  // Divider
-  divider: {
-    height: 1,
-    backgroundColor: COLOR.hair,
-    marginVertical: 24,
-  },
-
-  // Mood section
-  moodSection: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: COLOR.hair,
-    paddingHorizontal: 22,
-    paddingVertical: 18,
-  },
-  moodSectionLabel: {
-    fontFamily: "Helvetica-Bold",
-    fontSize: 9,
-    color: COLOR.muted,
-    letterSpacing: 2,
-    textTransform: "uppercase",
-    marginBottom: 14,
-    lineHeight: 1.2,
-  },
+  // Compact mood row
   moodRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 12,
+    marginVertical: 6,
   },
   moodLabel: {
-    fontFamily: "Times-Roman",
-    fontSize: 12.5,
-    color: COLOR.ink,
-    width: 150,
-    lineHeight: 1.2,
-  },
-  moodBullets: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-  },
-  moodBullet: {
-    width: 22, height: 22,
-    borderRadius: 11,
-    borderWidth: 1,
-    borderColor: COLOR.hair,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  moodBulletText: {
-    fontFamily: "Helvetica",
-    fontSize: 9,
-    color: COLOR.muted,
-    lineHeight: 1,
-  },
-  moodBulletTextFilled: {
-    color: "#FFFFFF",
-  },
-  moodLegend: {
-    fontFamily: "Helvetica",
+    fontFamily: "Inter",
+    fontWeight: 500,
     fontSize: 8.5,
     color: COLOR.muted,
-    marginTop: 2,
-    textAlign: "right",
-    letterSpacing: 0.5,
+    letterSpacing: 1.8,
+    textTransform: "uppercase",
+    lineHeight: 1.2,
+  },
+  moodGroup: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 14,
+  },
+  moodDots: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 7,
+  },
+  moodDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    borderWidth: 0.8,
+    borderColor: COLOR.hair,
+  },
+  moodLegend: {
+    fontFamily: "Inter",
+    fontWeight: 400,
+    fontSize: 8,
+    color: COLOR.muted,
+    letterSpacing: 0.4,
     lineHeight: 1.2,
   },
 
-  // Fields
-  fieldGroup: { marginBottom: 18 },
+  // Field group
+  field: {
+    marginBottom: 22,
+  },
   fieldLabel: {
-    fontFamily: "Helvetica-Bold",
-    fontSize: 9.5,
-    color: COLOR.ink,
-    marginBottom: 4,
-    letterSpacing: 0.3,
+    fontFamily: "Inter",
+    fontWeight: 500,
+    fontSize: 8.5,
+    color: COLOR.muted,
+    letterSpacing: 1.8,
     textTransform: "uppercase",
+    marginBottom: 6,
     lineHeight: 1.3,
   },
   fieldHint: {
-    fontFamily: "Helvetica-Oblique",
-    fontSize: 9,
+    fontFamily: "Inter",
+    fontWeight: 400,
+    fontStyle: "italic",
+    fontSize: 9.5,
     color: COLOR.muted,
+    marginBottom: 10,
+    lineHeight: 1.45,
+  },
+  fieldValue: {
+    fontFamily: "Inter",
+    fontWeight: 400,
+    fontSize: 10.5,
+    color: COLOR.ink,
+    lineHeight: 1.6,
+    marginTop: 4,
+  },
+  fillStack: {
+    flexDirection: "column",
+    gap: 16,
+    marginTop: 4,
+  },
+  fillLine: {
+    height: 0.8,
+    backgroundColor: COLOR.hair,
+  },
+
+  // Section heading (page 2)
+  section: {
+    marginBottom: 18,
+  },
+  sectionLabel: {
+    fontFamily: "Inter",
+    fontWeight: 500,
+    fontSize: 8.5,
+    color: COLOR.muted,
+    letterSpacing: 1.8,
+    textTransform: "uppercase",
     marginBottom: 8,
     lineHeight: 1.3,
   },
-  fillArea: {
-    flexDirection: "column",
-    gap: 14,
-    marginTop: 6,
+  sectionTitle: {
+    fontFamily: "Inter",
+    fontWeight: 400,
+    fontSize: 14,
+    color: COLOR.ink,
+    letterSpacing: -0.1,
+    marginBottom: 6,
+    lineHeight: 1.3,
   },
-  fillLine: {
-    height: 1,
-    backgroundColor: COLOR.hair,
-  },
-  fieldValue: {
-    fontFamily: "Helvetica",
+  sectionBody: {
+    fontFamily: "Inter",
+    fontWeight: 400,
     fontSize: 10.5,
     color: COLOR.ink,
-    lineHeight: 1.55,
-    marginTop: 2,
+    lineHeight: 1.65,
+    maxWidth: 440,
   },
 
-  // Panel / card
-  panel: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: COLOR.hair,
-    padding: 18,
-    marginVertical: 14,
-  },
-  panelTitle: {
-    fontFamily: "Times-Roman",
-    fontSize: 13,
-    color: COLOR.ink,
-    marginBottom: 8,
-    lineHeight: 1.25,
-  },
-  panelBody: {
-    fontFamily: "Helvetica",
-    fontSize: 10,
-    color: COLOR.muted,
-    lineHeight: 1.6,
-  },
-
-  // Breath panel
-  breathPanel: {
-    backgroundColor: COLOR.accentSoft,
-    borderRadius: 14,
-    padding: 18,
-    marginVertical: 16,
+  // Two-column block (vitórias + compromisso)
+  twoCol: {
     flexDirection: "row",
-    alignItems: "center",
-    gap: 18,
+    gap: 32,
+    marginTop: 6,
   },
-  breathText: { flex: 1 },
+  twoColItem: {
+    flex: 1,
+  },
 
-  // Footer
+  // Closing line
+  closing: {
+    fontFamily: "Inter",
+    fontWeight: 400,
+    fontStyle: "italic",
+    fontSize: 10.5,
+    color: COLOR.muted,
+    textAlign: "center",
+    lineHeight: 1.55,
+    marginTop: 8,
+  },
+
+  // Footer (fixed both pages)
   footer: {
     position: "absolute",
+    left: MARGIN_X,
+    right: MARGIN_X,
     bottom: 28,
-    left: 52,
-    right: 52,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
   footerText: {
-    fontFamily: "Helvetica",
+    fontFamily: "Inter",
+    fontWeight: 500,
     fontSize: 8,
     color: COLOR.muted,
-    letterSpacing: 1.5,
+    letterSpacing: 1.6,
     textTransform: "uppercase",
     lineHeight: 1.2,
   },
@@ -258,7 +285,7 @@ interface Props {
   worksheet: Worksheet;
   /** Optional answers keyed by field id — pre-fills the PDF when present. */
   answers?: Record<string, string>;
-  /** ISO date string for the "data" header. Defaults to today (pt-PT). */
+  /** ISO date string for the header. Defaults to today (pt-PT). */
   isoDate?: string;
   /** Optional mood snapshots */
   moodBefore?: number | null;
@@ -278,131 +305,116 @@ export function WorksheetPDF({
       subject={worksheet.description}
     >
       <Page size="A4" style={styles.page} wrap>
-        {/* Header */}
-        <View style={styles.topBar}>
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-            <BrandMark size={20} />
-            <Text style={styles.brand}>CONECTAMENTE</Text>
+        {/* Header — mark + brand left · date right */}
+        <View style={styles.header}>
+          <View style={styles.brand}>
+            <BrandDot />
+            <Text style={styles.brandText}>Conectamente</Text>
           </View>
-          <Text style={styles.date}>{dateLabel}</Text>
+          <Text style={styles.meta}>{dateLabel}</Text>
         </View>
+
+        <View style={styles.rule} />
 
         {/* Title block */}
         <View>
-          <Text style={styles.kicker}>{worksheet.category.toUpperCase()}</Text>
+          <Text style={styles.kicker}>{worksheet.category}</Text>
           <Text style={styles.title}>{worksheet.title}</Text>
-          <Text style={styles.subtitle}>{worksheet.intro}</Text>
+          <Text style={styles.intro}>{worksheet.intro}</Text>
         </View>
 
-        <View style={styles.divider} />
+        <View style={styles.rule} />
 
-        {/* Mood pre/post — agrupado num só painel, com números nos círculos
-            e legenda única em baixo. Substitui a versão anterior em que cada
-            linha tinha o seu próprio "1 mal · 5 bem", criando ruído visual. */}
-        <View style={styles.moodSection}>
-          <Text style={styles.moodSectionLabel}>Estado emocional</Text>
-
-          <View style={styles.moodRow}>
-            <Text style={styles.moodLabel}>Como me sinto antes</Text>
-            <MoodScale value={moodBefore} />
+        {/* Estado emocional · antes (compacto, no topo) */}
+        <View style={styles.moodRow}>
+          <Text style={styles.moodLabel}>Estado emocional · antes</Text>
+          <View style={styles.moodGroup}>
+            <MoodDots value={moodBefore} />
+            <Text style={styles.moodLegend}>1 — mal · 5 — bem</Text>
           </View>
-          <View style={styles.moodRow}>
-            <Text style={styles.moodLabel}>Como me sinto depois</Text>
-            <MoodScale value={moodAfter} />
-          </View>
-
-          <Text style={styles.moodLegend}>1 — muito mal · 5 — muito bem</Text>
         </View>
 
-        <View style={styles.divider} />
+        <View style={styles.ruleTight} />
 
-        {/* Worksheet fields */}
-        {worksheet.fields.map((f) => {
-          const value = filled(f.id);
-          const rows = f.rows && f.rows > 1 ? f.rows : 1;
-          return (
-            <View key={f.id} style={styles.fieldGroup} wrap={false}>
-              <Text style={styles.fieldLabel}>{f.label}</Text>
-              {f.hint && <Text style={styles.fieldHint}>{f.hint}</Text>}
-              {value ? (
-                // Filled value gets a subtle amber rule on the left for
-                // hierarchy — distinguishes pre-filled answers from blank
-                // fill-lines without changing typography weight.
-                <View
-                  style={{
-                    flexDirection: "row",
-                    gap: 10,
-                    marginTop: 4,
-                    paddingLeft: 2,
-                  }}
-                >
-                  <View
-                    style={{
-                      width: 2,
-                      backgroundColor: COLOR.amber,
-                      borderRadius: 1,
-                      opacity: 0.65,
-                    }}
-                  />
-                  <Text style={[styles.fieldValue, { flex: 1 }]}>{value}</Text>
-                </View>
-              ) : (
-                <View style={styles.fillArea}>
-                  {Array.from({ length: rows }).map((_, i) => (
-                    <View key={i} style={styles.fillLine} />
-                  ))}
-                </View>
-              )}
-            </View>
-          );
-        })}
+        {/* Main fields */}
+        <View style={{ marginTop: 10 }}>
+          {worksheet.fields.map((f) => {
+            const value = filled(f.id);
+            const rows = f.rows && f.rows > 1 ? f.rows : 1;
+            return (
+              <View key={f.id} style={styles.field} wrap={false}>
+                <Text style={styles.fieldLabel}>{f.label}</Text>
+                {f.hint && <Text style={styles.fieldHint}>{f.hint}</Text>}
+                {value ? (
+                  <Text style={styles.fieldValue}>{value}</Text>
+                ) : (
+                  <View style={styles.fillStack}>
+                    {Array.from({ length: rows }).map((_, i) => (
+                      <View key={i} style={styles.fillLine} />
+                    ))}
+                  </View>
+                )}
+              </View>
+            );
+          })}
+        </View>
 
-        {/* Mini exercise de respiração */}
-        <View style={styles.breathPanel} wrap={false}>
-          <BreathOrb />
-          <View style={styles.breathText}>
-            <Text style={styles.panelTitle}>Mini exercício · respiração 4-2-6</Text>
-            <Text style={styles.panelBody}>
-              Antes de fechar esta folha, respira durante 60 segundos. Inspira em 4
-              tempos, sustém 2, expira em 6. Sente o peso do corpo. Não tens nada
-              para resolver agora.
+        <View style={styles.ruleTight} />
+
+        {/* Estado emocional · depois */}
+        <View style={styles.moodRow}>
+          <Text style={styles.moodLabel}>Estado emocional · depois</Text>
+          <View style={styles.moodGroup}>
+            <MoodDots value={moodAfter} />
+            <Text style={styles.moodLegend}>1 — mal · 5 — bem</Text>
+          </View>
+        </View>
+
+        {/* Force page 2 — breath exercise + reflections live on a fresh page */}
+        <View break style={{ marginTop: 0 }}>
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>Mini exercício · respiração 4-2-6</Text>
+            <Text style={styles.sectionTitle}>Sessenta segundos antes de fechar a folha</Text>
+            <Text style={styles.sectionBody}>
+              Inspira em 4 tempos, sustém 2, expira em 6. Sente o peso do corpo,
+              os pés no chão, o ar a sair mais devagar do que entrou. Não tens
+              nada para resolver agora.
             </Text>
           </View>
-        </View>
 
-        {/* Pequenas vitórias + compromisso */}
-        <View style={[styles.panel, { flexDirection: "row", gap: 18 }]} wrap={false}>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.panelTitle}>Pequenas vitórias desta semana</Text>
-            <View style={[styles.fillArea, { marginTop: 6 }]}>
+          <View style={styles.rule} />
+
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>Pequenas vitórias desta semana</Text>
+            <View style={styles.fillStack}>
               <View style={styles.fillLine} />
               <View style={styles.fillLine} />
               <View style={styles.fillLine} />
             </View>
           </View>
-          <View style={{ width: 1, backgroundColor: COLOR.hair }} />
-          <View style={{ flex: 1 }}>
-            <Text style={styles.panelTitle}>Compromisso pessoal</Text>
-            <View style={[styles.fillArea, { marginTop: 6 }]}>
+
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>Compromisso pessoal</Text>
+            <View style={styles.fillStack}>
               <View style={styles.fillLine} />
               <View style={styles.fillLine} />
               <View style={styles.fillLine} />
             </View>
           </View>
+
+          {worksheet.closing && (
+            <>
+              <View style={styles.ruleTight} />
+              <Text style={styles.closing}>{worksheet.closing}</Text>
+            </>
+          )}
         </View>
 
-        {/* Optional closing line */}
-        {worksheet.closing && (
-          <View style={[styles.panel, { backgroundColor: COLOR.amberSoft, borderColor: COLOR.amberSoft }]} wrap={false}>
-            <Text style={{ ...styles.panelBody, fontStyle: "italic", textAlign: "center" }}>
-              {worksheet.closing}
-            </Text>
-          </View>
-        )}
-
-        {/* Footer */}
+        {/* Footer — fixed on every page */}
         <View fixed style={styles.footer}>
-          <Text style={styles.footerText}>Psicoeducativo · não substitui acompanhamento profissional</Text>
+          <Text style={styles.footerText}>
+            Psicoeducativo · não substitui acompanhamento profissional
+          </Text>
           <Text style={styles.footerText}>conectamente.pt</Text>
         </View>
       </Page>
@@ -412,73 +424,32 @@ export function WorksheetPDF({
 
 /* ------------------------------------------------------------------------ */
 
-function MoodScale({ value }: { value: number | null }) {
+function MoodDots({ value }: { value: number | null }) {
   return (
-    <View style={styles.moodBullets}>
+    <View style={styles.moodDots}>
       {[1, 2, 3, 4, 5].map((n) => {
-        const isFilled = value !== null && value !== undefined && value >= n;
+        const filled = value !== null && value !== undefined && value >= n;
         return (
           <View
             key={n}
             style={[
-              styles.moodBullet,
-              isFilled
-                ? { backgroundColor: COLOR.amber, borderColor: COLOR.amber }
+              styles.moodDot,
+              filled
+                ? { backgroundColor: COLOR.accent, borderColor: COLOR.accent }
                 : {},
             ]}
-          >
-            <Text
-              style={[
-                styles.moodBulletText,
-                isFilled ? styles.moodBulletTextFilled : {},
-              ]}
-            >
-              {n}
-            </Text>
-          </View>
+          />
         );
       })}
     </View>
   );
 }
 
-function BrandMark({ size = 24 }: { size?: number }) {
-  // Mini logomark — 5 nodes + centre + balance dot
-  const s = size;
-  const c = s / 2;
-  const nodes = [
-    [c, s * 0.18], [s * 0.82, s * 0.34], [s * 0.82, s * 0.66],
-    [c, s * 0.82], [s * 0.18, c],
-  ];
+function BrandDot() {
+  // A single 7pt sage circle — minimal, no fan, no amber accent.
   return (
-    <Svg width={s} height={s} viewBox={`0 0 ${s} ${s}`}>
-      <Circle cx={c} cy={c} r={s * 0.42} stroke={COLOR.accent} strokeOpacity={0.35} strokeWidth={1} fill="none" />
-      {nodes.map(([x, y], i) => (
-        <Line key={i} x1={c} y1={c} x2={x} y2={y} stroke={COLOR.accent} strokeOpacity={0.6} strokeWidth={0.7} />
-      ))}
-      {nodes.map(([x, y], i) => (
-        <Circle key={"n" + i} cx={x} cy={y} r={s * 0.06} fill={COLOR.accent} />
-      ))}
-      <Circle cx={c} cy={c} r={s * 0.08} fill={COLOR.accent} />
-      <Circle cx={s * 0.74} cy={s * 0.78} r={s * 0.07} fill={COLOR.amber} />
-    </Svg>
-  );
-}
-
-function BreathOrb() {
-  const s = 64;
-  const c = s / 2;
-  return (
-    <Svg width={s} height={s} viewBox={`0 0 ${s} ${s}`}>
-      <Circle cx={c} cy={c} r={28} fill={COLOR.accent} fillOpacity={0.08} />
-      <Circle cx={c} cy={c} r={20} fill={COLOR.accent} fillOpacity={0.16} />
-      <Circle cx={c} cy={c} r={12} fill={COLOR.accent} />
-      <Path
-        d={`M ${c - 8} ${c} q 4 -6 8 0 q 4 6 8 0`}
-        stroke="#fff"
-        strokeWidth={1.2}
-        fill="none"
-      />
+    <Svg width={7} height={7} viewBox="0 0 7 7">
+      <Circle cx={3.5} cy={3.5} r={3.5} fill={COLOR.accent} />
     </Svg>
   );
 }
