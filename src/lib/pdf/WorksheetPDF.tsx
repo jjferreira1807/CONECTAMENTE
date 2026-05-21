@@ -1,31 +1,28 @@
 /**
  * Worksheet PDF — calm, intentional, non-dopaminergic.
  *
- * One typographic family (Inter), one ink colour, one subtle sage accent,
- * generous whitespace. Page 1 holds the title, mood pre/post and main
- * fields. Page 2 holds the 4-2-6 breathing prompt, "pequenas vitórias",
- * "compromisso pessoal" and an optional closing line. Footer is fixed
- * on both pages.
+ * One typographic family (Helvetica, PDF built-in), one ink colour,
+ * one subtle sage accent, generous whitespace. Page 1 holds the title,
+ * mood pre/post and main fields. Page 2 holds the 4-2-6 breathing
+ * prompt, "pequenas vitórias", "compromisso pessoal" and an optional
+ * closing line. Footer is fixed on both pages.
  *
  * Margins: 20mm sides / 18mm top-bottom (A4 595×842 pt). Hair lines and
  * uppercase tracked labels replace the previous boxed cards. The amber
  * rule for filled answers and the decorative orbs have been removed.
  */
-import { Document, Page, Text, View, StyleSheet, Font, Svg, Circle } from "@react-pdf/renderer";
+import { Document, Page, Text, View, StyleSheet, Svg, Circle } from "@react-pdf/renderer";
 import type { Worksheet } from "@/content/worksheets";
 
-// One family, four weights + italic. Hosted on jsDelivr so generation
-// stays offline-tolerant (cached by the runtime after the first fetch).
-Font.register({
-  family: "Inter",
-  fonts: [
-    { src: "https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.16/files/inter-latin-300-normal.ttf", fontWeight: 300 },
-    { src: "https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.16/files/inter-latin-400-normal.ttf", fontWeight: 400 },
-    { src: "https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.16/files/inter-latin-500-normal.ttf", fontWeight: 500 },
-    { src: "https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.16/files/inter-latin-600-normal.ttf", fontWeight: 600 },
-    { src: "https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.16/files/inter-latin-400-italic.ttf", fontWeight: 400, fontStyle: "italic" },
-  ],
-});
+// Helvetica is built into every PDF reader — zero network, instant
+// generation, no risk of font fetch failure breaking the download.
+// Hierarchy comes from weight (Helvetica vs Helvetica-Bold), size and
+// tracking, not from family swaps.
+const FONT = {
+  regular: "Helvetica",
+  medium:  "Helvetica-Bold",
+  italic:  "Helvetica-Oblique",
+};
 
 // A4 margins: 20mm horizontal, 18mm vertical (1mm ≈ 2.835 pt)
 const MARGIN_X = 57;
@@ -46,9 +43,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: MARGIN_X,
     backgroundColor: COLOR.paper,
     color: COLOR.ink,
-    fontFamily: "Inter",
+    fontFamily: FONT.regular,
     fontSize: 11,
-    fontWeight: 400,
   },
 
   // Header band
@@ -64,8 +60,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   brandText: {
-    fontFamily: "Inter",
-    fontWeight: 500,
+    fontFamily: FONT.medium,
     fontSize: 9,
     color: COLOR.ink,
     letterSpacing: 3,
@@ -73,8 +68,7 @@ const styles = StyleSheet.create({
     lineHeight: 1.2,
   },
   meta: {
-    fontFamily: "Inter",
-    fontWeight: 400,
+    fontFamily: FONT.regular,
     fontSize: 9,
     color: COLOR.muted,
     letterSpacing: 0.4,
@@ -95,8 +89,7 @@ const styles = StyleSheet.create({
 
   // Title block
   kicker: {
-    fontFamily: "Inter",
-    fontWeight: 500,
+    fontFamily: FONT.medium,
     fontSize: 8.5,
     color: COLOR.accent,
     letterSpacing: 2.4,
@@ -105,8 +98,7 @@ const styles = StyleSheet.create({
     lineHeight: 1.2,
   },
   title: {
-    fontFamily: "Inter",
-    fontWeight: 300,
+    fontFamily: FONT.regular,
     fontSize: 26,
     color: COLOR.ink,
     letterSpacing: -0.2,
@@ -114,9 +106,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   intro: {
-    fontFamily: "Inter",
-    fontWeight: 400,
-    fontStyle: "italic",
+    fontFamily: FONT.italic,
     fontSize: 10,
     color: COLOR.muted,
     maxWidth: 440,
@@ -131,8 +121,7 @@ const styles = StyleSheet.create({
     marginVertical: 6,
   },
   moodLabel: {
-    fontFamily: "Inter",
-    fontWeight: 500,
+    fontFamily: FONT.medium,
     fontSize: 8.5,
     color: COLOR.muted,
     letterSpacing: 1.8,
@@ -157,8 +146,7 @@ const styles = StyleSheet.create({
     borderColor: COLOR.hair,
   },
   moodLegend: {
-    fontFamily: "Inter",
-    fontWeight: 400,
+    fontFamily: FONT.regular,
     fontSize: 8,
     color: COLOR.muted,
     letterSpacing: 0.4,
@@ -170,8 +158,7 @@ const styles = StyleSheet.create({
     marginBottom: 22,
   },
   fieldLabel: {
-    fontFamily: "Inter",
-    fontWeight: 500,
+    fontFamily: FONT.medium,
     fontSize: 8.5,
     color: COLOR.muted,
     letterSpacing: 1.8,
@@ -180,17 +167,14 @@ const styles = StyleSheet.create({
     lineHeight: 1.3,
   },
   fieldHint: {
-    fontFamily: "Inter",
-    fontWeight: 400,
-    fontStyle: "italic",
+    fontFamily: FONT.italic,
     fontSize: 9.5,
     color: COLOR.muted,
     marginBottom: 10,
     lineHeight: 1.45,
   },
   fieldValue: {
-    fontFamily: "Inter",
-    fontWeight: 400,
+    fontFamily: FONT.regular,
     fontSize: 10.5,
     color: COLOR.ink,
     lineHeight: 1.6,
@@ -211,8 +195,7 @@ const styles = StyleSheet.create({
     marginBottom: 18,
   },
   sectionLabel: {
-    fontFamily: "Inter",
-    fontWeight: 500,
+    fontFamily: FONT.medium,
     fontSize: 8.5,
     color: COLOR.muted,
     letterSpacing: 1.8,
@@ -221,8 +204,7 @@ const styles = StyleSheet.create({
     lineHeight: 1.3,
   },
   sectionTitle: {
-    fontFamily: "Inter",
-    fontWeight: 400,
+    fontFamily: FONT.regular,
     fontSize: 14,
     color: COLOR.ink,
     letterSpacing: -0.1,
@@ -230,8 +212,7 @@ const styles = StyleSheet.create({
     lineHeight: 1.3,
   },
   sectionBody: {
-    fontFamily: "Inter",
-    fontWeight: 400,
+    fontFamily: FONT.regular,
     fontSize: 10.5,
     color: COLOR.ink,
     lineHeight: 1.65,
@@ -250,9 +231,7 @@ const styles = StyleSheet.create({
 
   // Closing line
   closing: {
-    fontFamily: "Inter",
-    fontWeight: 400,
-    fontStyle: "italic",
+    fontFamily: FONT.italic,
     fontSize: 10.5,
     color: COLOR.muted,
     textAlign: "center",
@@ -271,8 +250,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   footerText: {
-    fontFamily: "Inter",
-    fontWeight: 500,
+    fontFamily: FONT.medium,
     fontSize: 8,
     color: COLOR.muted,
     letterSpacing: 1.6,
@@ -371,7 +349,7 @@ export function WorksheetPDF({
         </View>
 
         {/* Force page 2 — breath exercise + reflections live on a fresh page */}
-        <View break style={{ marginTop: 0 }}>
+        <View break>
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>Mini exercício · respiração 4-2-6</Text>
             <Text style={styles.sectionTitle}>Sessenta segundos antes de fechar a folha</Text>
@@ -402,12 +380,12 @@ export function WorksheetPDF({
             </View>
           </View>
 
-          {worksheet.closing && (
-            <>
+          {worksheet.closing ? (
+            <View>
               <View style={styles.ruleTight} />
               <Text style={styles.closing}>{worksheet.closing}</Text>
-            </>
-          )}
+            </View>
+          ) : null}
         </View>
 
         {/* Footer — fixed on every page */}
